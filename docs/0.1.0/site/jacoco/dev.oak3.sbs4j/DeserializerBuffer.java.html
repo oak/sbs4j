@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DeserializerBuffer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dev.oak3:sbs4j</a> &gt; <a href="index.source.html" class="el_package">dev.oak3.sbs4j</a> &gt; <span class="el_source">DeserializerBuffer.java</span></div><h1>DeserializerBuffer.java</h1><pre class="source lang-java linenums">package dev.oak3.sbs4j;
+
+import dev.oak3.sbs4j.exception.InvalidByteStringException;
+import dev.oak3.sbs4j.exception.ValueDeserializationException;
+import dev.oak3.sbs4j.helper.StringByteHelper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
+
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Deserializing methods
+ *
+ * @since 0.1.0
+ */
+public class DeserializerBuffer {
+
+    private final ByteBuffer buffer;
+
+<span class="fc" id="L25">    private static final Logger LOGGER = LoggerFactory.getLogger(DeserializerBuffer.class);</span>
+
+    private static final String LOG_BUFFER_INIT_MESSAGE_STRING = &quot;Initializing with hexString: {}&quot;;
+    private static final String LOG_BUFFER_VALUE_MESSAGE_STRING = &quot;Buffer value: {}&quot;;
+    private static final String LOG_SERIALIZED_VALUE_MESSAGE_STRING = &quot;Deserialized value for {}: {}&quot;;
+    private static final String SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING = &quot;Value %s out of bounds for expected type %s&quot;;
+
+    /**
+     * Initializes buffer with serialized bytes a byte array
+     *
+     * @param bytes byte array to deserialize and read from
+     */
+<span class="fc" id="L37">    public DeserializerBuffer(byte[] bytes) {</span>
+<span class="fc" id="L38">        this.buffer = ByteBuffer.wrap(bytes);</span>
+<span class="fc" id="L39">        this.buffer.order(ByteOrder.LITTLE_ENDIAN);</span>
+<span class="fc" id="L40">        this.buffer.mark();</span>
+
+<span class="fc" id="L42">        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_STRING, Arrays.toString(bytes));</span>
+<span class="fc" id="L43">    }</span>
+
+    /**
+     * Initializes buffer with serialized bytes from hex-encoded {@link String}
+     *
+     * @param hexString hex-encoded {@link String} to deserialize and read from
+     * @throws InvalidByteStringException if the byte string is invalid or can't be parsed
+     */
+    public DeserializerBuffer(String hexString) throws InvalidByteStringException {
+<span class="fc" id="L52">        this(StringByteHelper.hexStringToByteArray(hexString));</span>
+
+<span class="fc" id="L54">        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_STRING, hexString);</span>
+<span class="fc" id="L55">    }</span>
+
+    /**
+     * Reads a Boolean value
+     *
+     * @return true if 1, while false if 0
+     * @throws ValueDeserializationException exception holding information of failure to deserialize a value
+     */
+    public Boolean readBool() throws ValueDeserializationException {
+<span class="fc" id="L64">        byte buf = this.buffer.get();</span>
+
+<span class="fc" id="L66">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
+
+<span class="pc bpc" id="L68" title="1 of 2 branches missed.">        if (buf == 1) {</span>
+<span class="fc" id="L69">            return true;</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        } else if (buf == 0) {</span>
+<span class="nc" id="L71">            return false;</span>
+        } else {
+<span class="nc" id="L73">            throw new ValueDeserializationException(</span>
+<span class="nc" id="L74">                    String.format(SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING, buf, Boolean.class.getSimpleName()));</span>
+        }
+    }
+
+    /**
+     * Reads a byte from buffer
+     *
+     * @return the byte
+     */
+    public byte readU8() {
+<span class="fc" id="L84">        byte u8 = this.buffer.get();</span>
+
+<span class="fc" id="L86">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), u8);</span>
+
+<span class="fc" id="L88">        return u8;</span>
+    }
+
+    /**
+     * Reads a byte[] from buffer
+     *
+     * @param length the length of the array
+     * @return the byte array as byte[]
+     */
+    public byte[] readByteArray(int length) {
+<span class="fc" id="L98">        byte[] bytes = readBytes(length);</span>
+
+<span class="fc" id="L100">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), bytes);</span>
+
+<span class="fc" id="L102">        return bytes;</span>
+    }
+
+    /**
+     * Reads a float of 32 bits (4 bytes)
+     *
+     * @return the number as a float
+     */
+    public float readF32() {
+<span class="fc" id="L111">        float floatNumber = this.buffer.getFloat();</span>
+
+<span class="fc" id="L113">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), floatNumber);</span>
+
+<span class="fc" id="L115">        return floatNumber;</span>
+    }
+
+    /**
+     * Reads a float of 64 bits (8 bytes)
+     *
+     * @return the number as a double
+     */
+    public double readF64() {
+<span class="fc" id="L124">        double doubleNumber = this.buffer.getDouble();</span>
+
+<span class="fc" id="L126">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), doubleNumber);</span>
+
+<span class="fc" id="L128">        return doubleNumber;</span>
+    }
+
+    /**
+     * Reads a signed int of 32 bits (4 bytes)
+     *
+     * @return the number as an int
+     */
+    public int readI32() {
+<span class="fc" id="L137">        int integerNumber = this.buffer.getInt();</span>
+
+<span class="fc" id="L139">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);</span>
+
+<span class="fc" id="L141">        return integerNumber;</span>
+    }
+
+    /**
+     * Reads an unsigned int of 32 bits (4 bytes)
+     *
+     * @return the number as a long
+     */
+    public long readU32() {
+<span class="fc" id="L150">        long unsignedInteger = this.buffer.getLong();</span>
+
+<span class="fc" id="L152">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);</span>
+
+<span class="fc" id="L154">        return unsignedInteger;</span>
+    }
+
+    /**
+     * Reads a signed int of 64 bits (8 bytes)
+     *
+     * @return the number as a long
+     */
+    public long readI64() {
+<span class="fc" id="L163">        long longNumber = this.buffer.getLong();</span>
+
+<span class="fc" id="L165">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), longNumber);</span>
+
+<span class="fc" id="L167">        return longNumber;</span>
+    }
+
+    /**
+     * Reads an unsigned int of 64 bits (8 bytes)
+     *
+     * @return the number as a BigInteger
+     */
+    public BigInteger readU64() {
+        // Since this is a positive (unsigned) number, we should prefix with a zero
+        // byte to parse correctly
+<span class="fc" id="L178">        ByteBuffer bb = ByteBuffer.allocate(9);</span>
+<span class="fc" id="L179">        bb.put((byte) 0);</span>
+<span class="fc" id="L180">        bb.putLong(this.buffer.getLong());</span>
+<span class="fc" id="L181">        BigInteger unsignedLong = new BigInteger(bb.array());</span>
+
+<span class="fc" id="L183">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), unsignedLong);</span>
+
+<span class="fc" id="L185">        return unsignedLong;</span>
+    }
+
+    /**
+     * Reads an unsigned int of 128 bits (16 bytes) max
+     *
+     * @return the number as a BigInteger
+     */
+    public BigInteger readU128() {
+<span class="nc" id="L194">        return this.readBigInteger();</span>
+    }
+
+    /**
+     * Reads U256 from buffer
+     *
+     * @return the number as a BigInteger
+     */
+    public BigInteger readU256() {
+<span class="nc" id="L203">        return this.readBigInteger();</span>
+    }
+
+    /**
+     * Reads U512 from buffer
+     *
+     * @return the number as a BigInteger
+     */
+    public BigInteger readU512() {
+<span class="fc" id="L212">        return this.readBigInteger();</span>
+    }
+
+    /**
+     * Larger numeric values (e.g., U128, U256, U512) serialize as one byte of the
+     * length of the next number, followed by the two’s complement representation
+     * with little-endian byte order.
+     *
+     * @return the number as a BigInteger
+     */
+    protected BigInteger readBigInteger() {
+<span class="fc" id="L223">        byte lengthOfNextNumber = this.buffer.get();</span>
+
+<span class="fc" id="L225">        LOGGER.debug(&quot;Length of next number: {}&quot;, lengthOfNextNumber);</span>
+
+<span class="fc" id="L227">        byte[] buf = new byte[lengthOfNextNumber];</span>
+
+<span class="fc" id="L229">        this.buffer.get(buf, 0, lengthOfNextNumber);</span>
+
+<span class="fc" id="L231">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
+
+<span class="fc" id="L233">        BigInteger bigInt = new BigInteger(StringByteHelper.convertBytesToHex(buf), 16);</span>
+
+<span class="fc" id="L235">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), bigInt);</span>
+
+<span class="fc" id="L237">        return bigInt;</span>
+    }
+
+    /**
+     * Reads a String value from buffer
+     *
+     * @return the String read
+     */
+    public String readString() {
+<span class="fc" id="L246">        int length = this.buffer.getInt();</span>
+
+<span class="fc" id="L248">        LOGGER.debug(&quot;Reading string of length: {}&quot;, length);</span>
+
+<span class="fc" id="L250">        byte[] bufString = new byte[length];</span>
+
+<span class="fc" id="L252">        this.buffer.get(bufString, 0, length);</span>
+
+<span class="fc" id="L254">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, bufString);</span>
+
+<span class="fc" id="L256">        String string = new String(bufString);</span>
+
+<span class="fc" id="L258">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, String.class.getSimpleName(), string);</span>
+
+<span class="fc" id="L260">        return string;</span>
+    }
+
+    /**
+     * Reads a specified number of bytes
+     *
+     * @param length the number of bytes to read
+     * @return bytes read
+     */
+    protected byte[] readBytes(int length) {
+<span class="fc" id="L270">        byte[] buf = new byte[length];</span>
+
+<span class="fc" id="L272">        this.buffer.get(buf, 0, length);</span>
+
+<span class="fc" id="L274">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
+
+<span class="fc" id="L276">        return buf;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
