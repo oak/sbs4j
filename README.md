@@ -121,6 +121,8 @@ public class Point implements SerializableObject, DeserializableObject {
 
 The following features are planned to be supported:
 
+- Ensure Android support
+- Improve support for customization
 - Helper methods for serializing/deserializing more complex objects easier and with less code (e.g., List, Map,
   Optional, etc.).
 - Alternative reflection-based serialization and deserialization (i.e., process an object and its fields without writing any custom
