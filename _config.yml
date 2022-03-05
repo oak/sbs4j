@@ -1,11 +1,13 @@
 # Configurations
-title:            sbs4j
-longtitle:        Simple binary serialization library for Java.
-author:           Alexandre Carvalho
-email:            adcarvalho@gmail.com
+title: sbs4j
+longtitle: Simple binary serialization library for Java.
+author: Alexandre Carvalho
+email: adcarvalho@gmail.com
 description: >
   This project aims to be a simple but effective java primitives and object byte array serializer/deserializer.
 
 baseurl: '/sbs4j'
+
+exclude: [ templates ]
 
 remote_theme: oak/architect

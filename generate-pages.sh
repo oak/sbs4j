@@ -17,7 +17,10 @@ git checkout master -- $SOURCE_INDEX_FILE
 cp -f $SOURCE_TEMPLATES_LOCATION/.gitignore .
 cp -f $SOURCE_TEMPLATES_LOCATION/_config.yml .
 cp -f $SOURCE_TEMPLATES_LOCATION/Gemfile .
-cp -f $SOURCE_TEMPLATES_LOCATION/pages/*.md $TARGET_PAGES_LOCATION/
+cp -f $SOURCE_TEMPLATES_LOCATION/pages/index.md .
+cp -f $SOURCE_TEMPLATES_LOCATION/pages/jacoco-report.md $TARGET_PAGES_LOCATION/
+cp -f $SOURCE_TEMPLATES_LOCATION/pages/javadoc.md $TARGET_PAGES_LOCATION/
+cp -f $SOURCE_TEMPLATES_LOCATION/pages/tests-results.md $TARGET_PAGES_LOCATION/
 cat $SOURCE_INDEX_FILE >> index.md
 
 echo -e "version\nlatest" > $TARGET_VERSIONS_FILE

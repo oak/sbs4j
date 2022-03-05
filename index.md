@@ -1,3 +1,10 @@
+---
+title: sbs4j
+menu_item: true
+menu_title: Home
+layout: default
+order: 1
+---
 # sbs4j (Simple Byte Serializer for Java)
 
 [![Java CI](https://github.com/oak/sbs4j/actions/workflows/build.yml/badge.svg)](https://github.com/oak/sbs4j/actions/workflows/build.yml)
