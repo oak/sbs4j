@@ -2,6 +2,7 @@ package dev.oak3.sbs4j;
 
 import dev.oak3.sbs4j.exception.ValueSerializationException;
 import dev.oak3.sbs4j.model.Point;
+import dev.oak3.sbs4j.model.Polygon;
 import dev.oak3.sbs4j.model.Sphere;
 import dev.oak3.sbs4j.model.TestData;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -28,7 +30,6 @@ class SerializerBufferTest {
 
         byte[] serializedBytes = serializerBuffer.toByteArray();
 
-        assertNotNull(serializedBytes);
         assertArrayEquals(expectedBytes, serializedBytes);
     }
 
@@ -44,7 +45,28 @@ class SerializerBufferTest {
 
         byte[] serializedBytes = serializerBuffer.toByteArray();
 
-        assertNotNull(serializedBytes);
+        assertArrayEquals(expectedBytes, serializedBytes);
+    }
+
+    @Test
+    void serializePolygon_should_match_expected_array() {
+        byte[] expectedBytes = new byte[]{4, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0};
+
+        SerializerBuffer serializerBuffer = new SerializerBuffer();
+
+        Polygon square = new Polygon();
+
+        Point p1 = new Point(1, 1, 0);
+        Point p2 = new Point(1, -1, 0);
+        Point p3 = new Point(-1, -1, 0);
+        Point p4 = new Point(-1, 1, 0);
+
+        square.setVertices(Arrays.asList(p1, p2, p3, p4));
+
+        square.serialize(serializerBuffer);
+
+        byte[] serializedBytes = serializerBuffer.toByteArray();
+
         assertArrayEquals(expectedBytes, serializedBytes);
     }
 

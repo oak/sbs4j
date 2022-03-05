@@ -3,6 +3,7 @@ package dev.oak3.sbs4j;
 import dev.oak3.sbs4j.exception.InvalidByteStringException;
 import dev.oak3.sbs4j.exception.ValueDeserializationException;
 import dev.oak3.sbs4j.model.Point;
+import dev.oak3.sbs4j.model.Polygon;
 import dev.oak3.sbs4j.model.Sphere;
 import dev.oak3.sbs4j.model.TestData;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,6 +47,27 @@ class DeserializerBufferTest {
         sphere.deserialize(deserializerBuffer);
 
         assertEquals(expected, sphere);
+    }
+
+    @Test
+    void deserializePolygon_should_match_expected_object() {
+        byte[] serializedBytes = new byte[]{4, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0};
+
+        DeserializerBuffer deserializerBuffer = new DeserializerBuffer(serializedBytes);
+
+        Polygon expected = new Polygon();
+
+        Point p1 = new Point(1, 1, 0);
+        Point p2 = new Point(1, -1, 0);
+        Point p3 = new Point(-1, -1, 0);
+        Point p4 = new Point(-1, 1, 0);
+
+        expected.setVertices(Arrays.asList(p1, p2, p3, p4));
+
+        Polygon polygon = new Polygon();
+        polygon.deserialize(deserializerBuffer);
+
+        assertEquals(expected, polygon);
     }
 
     @Test
