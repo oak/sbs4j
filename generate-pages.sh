@@ -13,7 +13,7 @@ mkdir -p $TARGET_PAGES_LOCATION/versions
 rm $TARGET_PAGES_LOCATION/*
 
 # Copy base files
-git checkout master -- $SOURCE_INDEX_FILE
+git checkout $MASTER_BRANCH_NAME -- $SOURCE_INDEX_FILE
 cp -f $SOURCE_TEMPLATES_LOCATION/.gitignore .
 cp -f $SOURCE_TEMPLATES_LOCATION/_config.yml .
 cp -f $SOURCE_TEMPLATES_LOCATION/Gemfile .
