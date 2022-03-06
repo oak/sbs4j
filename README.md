@@ -31,7 +31,7 @@ the object hierarchy either serializing or deserializing its values.
 
 ``` xml
 <dependency>
-    <groupId>io.github.oak</groupId>
+    <groupId>dev.oak3</groupId>
     <artifactId>sbs4j</artifactId>
     <version>VERSION</version>
 </dependency>
@@ -40,7 +40,7 @@ the object hierarchy either serializing or deserializing its values.
 #### Using gradle
 
 ``` groovy
-implementation 'io.github.oak:sbs4j:VERSION'
+implementation 'dev.oak3:sbs4j:VERSION'
 ```
 
 ### Usage
@@ -101,21 +101,21 @@ public class Point implements SerializableObject, DeserializableObject {
 
 ## Primitive Type Mappings
 
-| sbs4j                 | Java         | Status      |
-|-----------------------|--------------|-------------|
-| `boolean` boolean     | `byte`       | implemented |
-| `u8` integer          | `byte`       | implemented |
-| `u16` integer         | `short`      | implemented |
-| `i32` integer         | `int`        | implemented |
-| `u32` integer         | `long`       | implemented |
-| `i64` integer         | `long`       | implemented |
-| `u64` integer         | `BigInteger` | implemented |
-| `u128` integer        | `BigInteger` | implemented |
-| `u256` integer        | `BigInteger` | implemented |
-| `u512` integer        | `BigInteger` | implemented |
-| `u128` integer        | `BigInteger` | implemented |
-| `f32` float           | `float`      | implemented |
-| `f64` float           | `double`     | implemented |
+| sbs4j          | Java         | Status      |
+|----------------|--------------|-------------|
+| `boolean` byte | `boolean`    | implemented |
+| `u8` integer   | `byte`       | implemented |
+| `u16` integer  | `short`      | implemented |
+| `i32` integer  | `int`        | implemented |
+| `u32` integer  | `long`       | implemented |
+| `i64` integer  | `long`       | implemented |
+| `u64` integer  | `BigInteger` | implemented |
+| `u128` integer | `BigInteger` | implemented |
+| `u256` integer | `BigInteger` | implemented |
+| `u512` integer | `BigInteger` | implemented |
+| `u128` integer | `BigInteger` | implemented |
+| `f32` float    | `float`      | implemented |
+| `f64` float    | `double`     | implemented |
 
 ## Roadmap
 
