@@ -16,11 +16,12 @@ jobs:
         uses: actions/checkout@v2
         with:
           ref: gh-pages
+          fetch-depth: 0
 
       - name: Generate pages from present docs folders and templates
         run: bash ./generate-pages.sh
         env:
-          MASTER_BRANCH_NAME: master
+          MASTER_BRANCH_NAME: origin/master
           SOURCE_INDEX_FILE: README.md
 
       - name: Commit changes
