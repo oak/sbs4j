@@ -6,7 +6,7 @@
 
     <groupId>dev.oak3</groupId>
     <artifactId>sbs4j</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0-SNAPSHOT</version>
 
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Simple binary serialization library for Java</description>
