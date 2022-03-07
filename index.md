@@ -135,12 +135,12 @@ The following features are planned to be supported:
 - Alternative reflection-based serialization and deserialization (i.e., process an object and its fields without writing any custom
   code).
 
-[`SerializerBuffer`]: https://github.com/oak/sbs4j/blob/master/src/main/java/dev/oak3/sbs4j/SerializerBuffer.java
+[`SerializerBuffer`]: https://github.com/oak/sbs4j/blob/main/src/main/java/dev/oak3/sbs4j/SerializerBuffer.java
 
-[`DeserializerBuffer`]: https://github.com/oak/sbs4j/blob/master/src/main/java/dev/oak3/sbs4j/DeserializerBuffer.java
+[`DeserializerBuffer`]: https://github.com/oak/sbs4j/blob/main/src/main/java/dev/oak3/sbs4j/DeserializerBuffer.java
 
-[`SerializableObject`]: https://github.com/oak/sbs4j/blob/master/src/main/java/dev/oak3/sbs4j/interfaces/SerializableObject.java
+[`SerializableObject`]: https://github.com/oak/sbs4j/blob/main/src/main/java/dev/oak3/sbs4j/interfaces/SerializableObject.java
 
-[`DeserializableObject`]: https://github.com/oak/sbs4j/blob/master/src/main/java/dev/oak3/sbs4j/interfaces/DeserializableObject.java
+[`DeserializableObject`]: https://github.com/oak/sbs4j/blob/main/src/main/java/dev/oak3/sbs4j/interfaces/DeserializableObject.java
 
-[`tests`]: https://github.com/oak/sbs4j/blob/master/src/test/java/dev/oak3/sbs4j/
+[`tests`]: https://github.com/oak/sbs4j/blob/main/src/test/java/dev/oak3/sbs4j/
