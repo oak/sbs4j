@@ -8,6 +8,6 @@ description: >
 
 baseurl: '/sbs4j'
 
-exclude: [ templates ]
+exclude: [ templates, generate-pages.sh ]
 
 remote_theme: oak/architect
