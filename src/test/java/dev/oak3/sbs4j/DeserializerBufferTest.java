@@ -1,6 +1,5 @@
 package dev.oak3.sbs4j;
 
-import dev.oak3.sbs4j.exception.InvalidByteStringException;
 import dev.oak3.sbs4j.exception.ValueDeserializationException;
 import dev.oak3.sbs4j.model.Point;
 import dev.oak3.sbs4j.model.Polygon;
@@ -12,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -73,71 +73,71 @@ class DeserializerBufferTest {
     @Test
     void validateDeserialize_with_SampleData() throws ValueDeserializationException {
         for (TestData<?> testData : TestData.SUCCESS_TEST_DATA) {
-            DeserializerBuffer deserializerBuffer = new DeserializerBuffer(testData.getByteValue());
+            DeserializerBuffer deserializerBuffer = new DeserializerBuffer(testData.getByteValueLittleEndian());
             switch (testData.getName()) {
                 case TestData.BOOLEAN:
                     boolean valueBool = deserializerBuffer.readBool();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueBool);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueBool, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueBool);
                     break;
                 case TestData.BYTE_ARRAY:
-                    byte[] valueByteArray = deserializerBuffer.readByteArray(testData.getByteValue().length);
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueByteArray);
+                    byte[] valueByteArray = deserializerBuffer.readByteArray(testData.getByteValueLittleEndian().length);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueByteArray, testData.getByteValueLittleEndianHex());
                     assertArrayEquals((byte[]) testData.getValue(), valueByteArray);
                     break;
                 case TestData.U_8:
                     byte valueU8 = deserializerBuffer.readU8();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueU8);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU8, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueU8);
                     break;
                 case TestData.U_32:
                     long valueU32 = deserializerBuffer.readU32();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueU32);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU32, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueU32);
                     break;
                 case TestData.F_32:
                     float valueF32 = deserializerBuffer.readF32();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueF32);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueF32, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueF32);
                     break;
                 case TestData.F_64:
                     double valueF64 = deserializerBuffer.readF64();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueF64);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueF64, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueF64);
                     break;
                 case TestData.U_64:
                     BigInteger valueU64 = deserializerBuffer.readU64();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueU64);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU64, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueU64);
                     break;
                 case TestData.I_32:
                     int valueI32 = deserializerBuffer.readI32();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueI32);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueI32, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueI32);
                     break;
                 case TestData.I_64:
                     long valueI64 = deserializerBuffer.readI64();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueI64);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueI64, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueI64);
                     break;
                 case TestData.U_128:
                     BigInteger valueU128 = deserializerBuffer.readU128();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueU128);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU128, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueU128);
                     break;
                 case TestData.U_256:
                     BigInteger valueU256 = deserializerBuffer.readU256();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueU256);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU256, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueU256);
                     break;
                 case TestData.U_512:
                     BigInteger valueU512 = deserializerBuffer.readU512();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueU512);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU512, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueU512);
                     break;
                 case TestData.STRING:
                     String valueString = deserializerBuffer.readString();
-                    LOGGER.debug("Expected: {}, Actual: {}", testData.getValue(), valueString);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueString, testData.getByteValueLittleEndianHex());
                     assertEquals(testData.getValue(), valueString);
                     break;
             }
@@ -145,7 +145,94 @@ class DeserializerBufferTest {
     }
 
     @Test
-    void dataWithWrongInputLength_should_throw_BufferUnderflowException() throws InvalidByteStringException {
+    void validateDeserialize_BIG_ENDIAN_with_SampleData() throws ValueDeserializationException {
+        for (TestData<?> testData : TestData.SUCCESS_TEST_DATA) {
+            DeserializerBuffer deserializerBuffer;
+            switch (testData.getName()) {
+                case TestData.BOOLEAN:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian());
+                    boolean valueBool = deserializerBuffer.readBool();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueBool, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueBool);
+                    break;
+                case TestData.BYTE_ARRAY:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    byte[] valueByteArray = deserializerBuffer.readByteArray(testData.getByteValueBigEndian().length);
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueByteArray, testData.getByteValueBigEndianHex());
+                    assertArrayEquals((byte[]) testData.getValue(), valueByteArray);
+                    break;
+                case TestData.U_8:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    byte valueU8 = deserializerBuffer.readU8();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU8, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueU8);
+                    break;
+                case TestData.U_32:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    long valueU32 = deserializerBuffer.readU32();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU32, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueU32);
+                    break;
+                case TestData.F_32:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    float valueF32 = deserializerBuffer.readF32();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueF32, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueF32);
+                    break;
+                case TestData.F_64:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    double valueF64 = deserializerBuffer.readF64();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueF64, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueF64);
+                    break;
+                case TestData.U_64:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    BigInteger valueU64 = deserializerBuffer.readU64();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU64, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueU64);
+                    break;
+                case TestData.I_32:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    int valueI32 = deserializerBuffer.readI32();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueI32, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueI32);
+                    break;
+                case TestData.I_64:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    long valueI64 = deserializerBuffer.readI64();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueI64, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueI64);
+                    break;
+                case TestData.U_128:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    BigInteger valueU128 = deserializerBuffer.readU128();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU128, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueU128);
+                    break;
+                case TestData.U_256:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    BigInteger valueU256 = deserializerBuffer.readU256();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU256, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueU256);
+                    break;
+                case TestData.U_512:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    BigInteger valueU512 = deserializerBuffer.readU512();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueU512, testData.getByteValueBigEndianHex());
+                    assertEquals(testData.getValue(), valueU512);
+                    break;
+                case TestData.STRING:
+                    deserializerBuffer = new DeserializerBuffer(testData.getByteValueBigEndian(), ByteOrder.BIG_ENDIAN);
+                    String valueString = deserializerBuffer.readString();
+                    LOGGER.debug("Expected: {}, Actual: {} - Hex: {}", testData.getValue(), valueString, testData.getByteValueLittleEndianHex());
+                    assertEquals(testData.getValue(), valueString);
+                    break;
+            }
+        }
+    }
+
+    @Test
+    void dataWithWrongInputLength_should_throw_BufferUnderflowException() {
         DeserializerBuffer deserializerBuffer1 = new DeserializerBuffer("");
 
         assertThrows(BufferUnderflowException.class, deserializerBuffer1::readBool);

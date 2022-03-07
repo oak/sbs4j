@@ -1,8 +1,7 @@
 package dev.oak3.sbs4j;
 
-import dev.oak3.sbs4j.exception.InvalidByteStringException;
 import dev.oak3.sbs4j.exception.ValueDeserializationException;
-import dev.oak3.sbs4j.helper.StringByteHelper;
+import dev.oak3.sbs4j.util.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,8 +9,6 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * Deserializing methods
@@ -24,34 +21,54 @@ public class DeserializerBuffer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeserializerBuffer.class);
 
-    private static final String LOG_BUFFER_INIT_MESSAGE_STRING = "Initializing with hexString: {}";
+    private static final String LOG_BUFFER_INIT_MESSAGE_HEX_STRING = "Initializing with hexString: {} and byte order {}";
+    private static final String LOG_BUFFER_INIT_MESSAGE = "Initializing with bytes: {} and byte order {}";
     private static final String LOG_BUFFER_VALUE_MESSAGE_STRING = "Buffer value: {}";
     private static final String LOG_SERIALIZED_VALUE_MESSAGE_STRING = "Deserialized value for {}: {}";
     private static final String SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING = "Value %s out of bounds for expected type %s";
 
     /**
-     * Initializes buffer with serialized bytes a byte array
+     * Initializes buffer with serialized bytes from hex-encoded {@link String}
      *
-     * @param bytes byte array to deserialize and read from
+     * @param hexString hex-encoded {@link String} to deserialize and read from
      */
-    public DeserializerBuffer(byte[] bytes) {
-        this.buffer = ByteBuffer.wrap(bytes);
-        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
-        this.buffer.mark();
-
-        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_STRING, Arrays.toString(bytes));
+    public DeserializerBuffer(String hexString) {
+        this(hexString.length() != 0 ? new BigInteger(hexString, 16).toByteArray() : new byte[]{});
     }
 
     /**
      * Initializes buffer with serialized bytes from hex-encoded {@link String}
      *
      * @param hexString hex-encoded {@link String} to deserialize and read from
-     * @throws InvalidByteStringException if the byte string is invalid or can't be parsed
+     * @param byteOrder the byte order to be using
      */
-    public DeserializerBuffer(String hexString) throws InvalidByteStringException {
-        this(StringByteHelper.hexStringToByteArray(hexString));
+    public DeserializerBuffer(String hexString, ByteOrder byteOrder) {
+        this(hexString.length() != 0 ? new BigInteger(hexString, 16).toByteArray() : new byte[]{}, byteOrder);
 
-        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_STRING, hexString);
+        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_HEX_STRING, hexString, byteOrder);
+    }
+
+    /**
+     * Initializes buffer with serialized bytes and {@link ByteOrder#LITTLE_ENDIAN}
+     *
+     * @param bytes byte array to deserialize and read from
+     */
+    public DeserializerBuffer(byte[] bytes) {
+        this(bytes, ByteOrder.LITTLE_ENDIAN);
+    }
+
+    /**
+     * Initializes buffer with serialized bytes and byte order
+     *
+     * @param bytes     byte array to deserialize and read from
+     * @param byteOrder the byte order to be using
+     */
+    public DeserializerBuffer(byte[] bytes, ByteOrder byteOrder) {
+        this.buffer = ByteBuffer.wrap(bytes);
+        this.buffer.order(byteOrder);
+        this.buffer.mark();
+
+        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE, Arrays.toString(bytes), byteOrder);
     }
 
     /**
@@ -224,13 +241,17 @@ public class DeserializerBuffer {
 
         LOGGER.debug("Length of next number: {}", lengthOfNextNumber);
 
-        byte[] buf = new byte[lengthOfNextNumber];
+        byte[] buf = new byte[lengthOfNextNumber + 1];
 
-        this.buffer.get(buf, 0, lengthOfNextNumber);
+        this.buffer.get(buf, 1, lengthOfNextNumber);
 
         LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);
 
-        BigInteger bigInt = new BigInteger(StringByteHelper.convertBytesToHex(buf), 16);
+        if (this.buffer.order() == ByteOrder.LITTLE_ENDIAN) {
+            ByteUtils.reverse(buf, 1, buf.length - 1);
+        }
+
+        BigInteger bigInt = new BigInteger(buf);
 
         LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), bigInt);
 

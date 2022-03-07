@@ -2,6 +2,7 @@ package dev.oak3.sbs4j;
 
 import dev.oak3.sbs4j.exception.NoSuchTypeException;
 import dev.oak3.sbs4j.exception.ValueSerializationException;
+import dev.oak3.sbs4j.util.ByteUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,20 +38,30 @@ public class SerializerBuffer {
     private static final String SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING = "Value %s out of bounds for expected type %s";
 
     /**
-     * Initializes buffer with initial capacity of {@link #INITIAL_CAPACITY} in bytes
+     * Initializes buffer with initial capacity of {@link #INITIAL_CAPACITY} in bytes and {@link ByteOrder#LITTLE_ENDIAN}
      */
     public SerializerBuffer() {
-        this(INITIAL_CAPACITY);
+        this(INITIAL_CAPACITY, ByteOrder.LITTLE_ENDIAN);
     }
 
     /**
-     * Initializes buffer with given initial capacity in bytes
+     * Initializes buffer with initial capacity of {@link #INITIAL_CAPACITY} and given byte order.
+     *
+     * @param byteOrder the byte order to be using
+     */
+    public SerializerBuffer(ByteOrder byteOrder) {
+        this(INITIAL_CAPACITY, byteOrder);
+    }
+
+    /**
+     * Initializes buffer with given initial capacity in bytes and byte order.
      *
      * @param initialCapacity the initial capacity of the buffer
+     * @param byteOrder       the byte order to be using
      */
-    public SerializerBuffer(int initialCapacity) {
+    public SerializerBuffer(int initialCapacity, ByteOrder byteOrder) {
         this.buffer = ByteBuffer.allocate(initialCapacity);
-        this.buffer.order(ByteOrder.LITTLE_ENDIAN);
+        this.buffer.order(byteOrder);
         this.buffer.mark();
     }
 
@@ -207,24 +218,28 @@ public class SerializerBuffer {
         requireNonNull(value);
         checkBoundsFor(value, size);
 
-        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(),
-                value);
+        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), value);
 
-        byte bigIntegerLength = (byte) (Math.ceil(value.bitLength() / 8.0));
+        byte bigIntegerLength = (byte) (Math.ceil(value.add(BigInteger.ONE).bitLength() / 8.0));
 
         byte[] byteArray = value.toByteArray();
 
-        // Removing leading zeroes
-        int i = 0;
-        boolean both = false;
-        while (byteArray[i] == 0) {
-            if (both) {
-                i++;
+        int skipped = 0;
+        boolean skip = true;
+        for (byte b : byteArray) {
+            boolean signByte = b == (byte) 0x00;
+            if (skip && signByte) {
+                skipped++;
+            } else if (skip) {
+                skip = false;
             }
-            both = !both;
         }
 
-        byte[] bigIntegerBytes = Arrays.copyOfRange(byteArray, i, bigIntegerLength + i);
+        byte[] bigIntegerBytes = Arrays.copyOfRange(byteArray, skipped, byteArray.length);
+
+        if (this.buffer.order() == ByteOrder.LITTLE_ENDIAN) {
+            ByteUtils.reverse(bigIntegerBytes);
+        }
 
         this.buffer.put(bigIntegerLength);
         this.buffer.put(bigIntegerBytes);

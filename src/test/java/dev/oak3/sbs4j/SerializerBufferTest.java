@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -77,68 +78,142 @@ class SerializerBufferTest {
             switch (testData.getName()) {
                 case TestData.BOOLEAN:
                     serializerBuffer.writeBool((Boolean) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Boolean.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Boolean.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.BYTE_ARRAY:
                     serializerBuffer.writeByteArray((byte[]) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", byte[].class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", byte[].class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.U_8:
                     serializerBuffer.writeU8((Byte) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Byte.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Byte.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.U_32:
                     serializerBuffer.writeU32((Long) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Long.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Long.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.F_32:
                     serializerBuffer.writeF32((Float) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Float.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Float.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.F_64:
                     serializerBuffer.writeF64((Double) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Double.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Double.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.U_64:
                     serializerBuffer.writeU64((BigInteger) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.I_32:
                     serializerBuffer.writeI32((Integer) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Integer.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Integer.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.I_64:
                     serializerBuffer.writeI64((Long) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", Long.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Long.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.U_128:
                     serializerBuffer.writeU128((BigInteger) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.U_256:
                     serializerBuffer.writeU256((BigInteger) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.U_512:
                     serializerBuffer.writeU512((BigInteger) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
                     break;
                 case TestData.STRING:
                     serializerBuffer.writeString((String) testData.getValue());
-                    LOGGER.debug("{} | Expected: {} | Actual {}", String.class.getSimpleName(), testData.getByteValue(), serializerBuffer.toByteArray());
-                    assertArrayEquals(testData.getByteValue(), serializerBuffer.toByteArray());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", String.class.getSimpleName(), testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueLittleEndian(), serializerBuffer.toByteArray());
+                    break;
+            }
+        }
+    }
+
+    @Test
+    void validateSerialize_BIG_ENDIAN_with_SampleData() throws ValueSerializationException {
+        for (TestData<?> testData : TestData.SUCCESS_TEST_DATA) {
+            SerializerBuffer serializerBuffer = new SerializerBuffer(ByteOrder.BIG_ENDIAN);
+            switch (testData.getName()) {
+                case TestData.BOOLEAN:
+                    serializerBuffer.writeBool((Boolean) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Boolean.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.BYTE_ARRAY:
+                    serializerBuffer.writeByteArray((byte[]) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", byte[].class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.U_8:
+                    serializerBuffer.writeU8((Byte) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Byte.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.U_32:
+                    serializerBuffer.writeU32((Long) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Long.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.F_32:
+                    serializerBuffer.writeF32((Float) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Float.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.F_64:
+                    serializerBuffer.writeF64((Double) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Double.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.U_64:
+                    serializerBuffer.writeU64((BigInteger) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.I_32:
+                    serializerBuffer.writeI32((Integer) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Integer.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.I_64:
+                    serializerBuffer.writeI64((Long) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", Long.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.U_128:
+                    serializerBuffer.writeU128((BigInteger) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.U_256:
+                    serializerBuffer.writeU256((BigInteger) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.U_512:
+                    serializerBuffer.writeU512((BigInteger) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", BigInteger.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    break;
+                case TestData.STRING:
+                    serializerBuffer.writeString((String) testData.getValue());
+                    LOGGER.debug("{} | Expected: {} | Actual {}", String.class.getSimpleName(), testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
+                    assertArrayEquals(testData.getByteValueBigEndian(), serializerBuffer.toByteArray());
                     break;
             }
         }
