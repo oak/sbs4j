@@ -3,7 +3,7 @@ name: generate-jekyll-pages-for-docs
 on:
   workflow_run:
     workflows: [ Update gh-pages ]
-    branches: [ master ]
+    branches: [ main ]
     types: [ completed ]
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
       - name: Generate pages from present docs folders and templates
         run: bash ./generate-pages.sh
         env:
-          MASTER_BRANCH_NAME: origin/master
+          MASTER_BRANCH_NAME: origin/main
           SOURCE_INDEX_FILE: README.md
 
       - name: Commit changes

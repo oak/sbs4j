@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: [ Java CI ]
     types: [ completed ]
-    branches: [ master ]
+    branches: [ main ]
 
 jobs:
   generate-docs-reports:
