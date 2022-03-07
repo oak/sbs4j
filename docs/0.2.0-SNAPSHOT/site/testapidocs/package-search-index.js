@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"dev.oak3.sbs4j"},{"l":"dev.oak3.sbs4j.model"}]
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"dev.oak3.sbs4j"},{"l":"dev.oak3.sbs4j.model"},{"l":"dev.oak3.sbs4j.util"}]
