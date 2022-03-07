@@ -1,4 +1,8 @@
 #! /bin/bash
+if ! test -n "${MASTER_BRANCH_NAME}"; then
+    MASTER_BRANCH_NAME=origin/master
+fi
+
 if ! test -n "${SOURCE_INDEX_FILE}"; then
     SOURCE_INDEX_FILE=README.md
 fi
@@ -13,14 +17,13 @@ mkdir -p $TARGET_PAGES_LOCATION/versions
 rm $TARGET_PAGES_LOCATION/*
 
 # Copy base files
+echo "Checking out $SOURCE_INDEX_FILE from $MASTER_BRANCH_NAME"
 git checkout $MASTER_BRANCH_NAME -- $SOURCE_INDEX_FILE
 cp -f $SOURCE_TEMPLATES_LOCATION/.gitignore .
 cp -f $SOURCE_TEMPLATES_LOCATION/_config.yml .
 cp -f $SOURCE_TEMPLATES_LOCATION/Gemfile .
 cp -f $SOURCE_TEMPLATES_LOCATION/pages/index.md .
-cp -f $SOURCE_TEMPLATES_LOCATION/pages/jacoco-report.md $TARGET_PAGES_LOCATION/
-cp -f $SOURCE_TEMPLATES_LOCATION/pages/javadoc.md $TARGET_PAGES_LOCATION/
-cp -f $SOURCE_TEMPLATES_LOCATION/pages/tests-results.md $TARGET_PAGES_LOCATION/
+find $SOURCE_TEMPLATES_LOCATION/pages/  -maxdepth 1 ! -name index.md -exec cp -t $TARGET_PAGES_LOCATION/ {} +
 cat $SOURCE_INDEX_FILE >> index.md
 
 echo -e "version\nlatest" > $TARGET_VERSIONS_FILE
