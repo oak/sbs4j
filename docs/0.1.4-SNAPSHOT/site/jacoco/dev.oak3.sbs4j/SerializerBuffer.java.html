@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SerializerBuffer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dev.oak3:sbs4j</a> &gt; <a href="index.source.html" class="el_package">dev.oak3.sbs4j</a> &gt; <span class="el_source">SerializerBuffer.java</span></div><h1>SerializerBuffer.java</h1><pre class="source lang-java linenums">package dev.oak3.sbs4j;
+
+import dev.oak3.sbs4j.exception.NoSuchTypeException;
+import dev.oak3.sbs4j.exception.ValueSerializationException;
+import dev.oak3.sbs4j.util.ByteUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.Arrays;
+
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Serializing methods
+ *
+ * @since 0.1.0
+ */
+public class SerializerBuffer {
+
+<span class="fc" id="L23">    private static final Logger LOGGER = LoggerFactory.getLogger(SerializerBuffer.class);</span>
+
+    private final ByteBuffer buffer;
+
+    private static final int INITIAL_CAPACITY = 4096;
+
+<span class="fc" id="L29">    public static final BigInteger ZERO = new BigInteger(&quot;0&quot;, 10);</span>
+<span class="fc" id="L30">    public static final BigInteger ONE = new BigInteger(&quot;1&quot;, 10);</span>
+<span class="fc" id="L31">    public static final BigInteger TWO = new BigInteger(&quot;2&quot;, 10);</span>
+<span class="fc" id="L32">    public static final BigInteger MAX_U64 = TWO.pow(64).subtract(ONE);</span>
+<span class="fc" id="L33">    public static final BigInteger MAX_U128 = TWO.pow(128).subtract(ONE);</span>
+<span class="fc" id="L34">    public static final BigInteger MAX_U256 = TWO.pow(256).subtract(ONE);</span>
+<span class="fc" id="L35">    public static final BigInteger MAX_U512 = TWO.pow(512).subtract(ONE);</span>
+
+    private static final String LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING = &quot;Writing type {} with value: {}&quot;;
+    private static final String SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING = &quot;Value %s out of bounds for expected type %s&quot;;
+
+    /**
+     * Initializes buffer with initial capacity of {@link #INITIAL_CAPACITY} in bytes and {@link ByteOrder#LITTLE_ENDIAN}
+     */
+    public SerializerBuffer() {
+<span class="fc" id="L44">        this(INITIAL_CAPACITY, ByteOrder.LITTLE_ENDIAN);</span>
+<span class="fc" id="L45">    }</span>
+
+    /**
+     * Initializes buffer with initial capacity of {@link #INITIAL_CAPACITY} and given byte order.
+     *
+     * @param byteOrder the byte order to be using
+     */
+    public SerializerBuffer(ByteOrder byteOrder) {
+<span class="fc" id="L53">        this(INITIAL_CAPACITY, byteOrder);</span>
+<span class="fc" id="L54">    }</span>
+
+    /**
+     * Initializes buffer with given initial capacity in bytes and byte order.
+     *
+     * @param initialCapacity the initial capacity of the buffer
+     * @param byteOrder       the byte order to be using
+     */
+<span class="fc" id="L62">    public SerializerBuffer(int initialCapacity, ByteOrder byteOrder) {</span>
+<span class="fc" id="L63">        this.buffer = ByteBuffer.allocate(initialCapacity);</span>
+<span class="fc" id="L64">        this.buffer.order(byteOrder);</span>
+<span class="fc" id="L65">        this.buffer.mark();</span>
+<span class="fc" id="L66">    }</span>
+
+    /**
+     * Writes a boolean value to the value byte buffer
+     *
+     * @param value boolean value to serialize
+     */
+    public void writeBool(boolean value) {
+<span class="fc" id="L74">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Boolean.class.getSimpleName(),</span>
+<span class="fc" id="L75">                value);</span>
+
+<span class="pc bpc" id="L77" title="1 of 2 branches missed.">        byte boolByte = Boolean.TRUE.equals(value) ? (byte) 0x01 : (byte) 0x00;</span>
+
+<span class="fc" id="L79">        this.buffer.put(boolByte);</span>
+<span class="fc" id="L80">    }</span>
+
+    /**
+     * Writes a single byte value
+     *
+     * @param value byte value to serialize
+     */
+    public void writeU8(byte value) {
+<span class="fc" id="L88">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L90">        this.buffer.put(value);</span>
+<span class="fc" id="L91">    }</span>
+
+    /**
+     * Writes a byte array value
+     *
+     * @param value byte array value to serialize
+     */
+    public void writeByteArray(byte[] value) {
+<span class="fc" id="L99">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, byte[].class.getSimpleName(), value);</span>
+
+<span class="fc" id="L101">        this.buffer.put(value);</span>
+<span class="fc" id="L102">    }</span>
+
+    /**
+     * Writes a Float/F32 value
+     *
+     * @param value F32 value to serialize
+     */
+    public void writeF32(float value) {
+<span class="fc" id="L110">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L112">        this.buffer.putFloat(value);</span>
+<span class="fc" id="L113">    }</span>
+
+    /**
+     * Writes a Double/F64 value
+     *
+     * @param value F64 value to serialize
+     */
+    public void writeF64(double value) {
+<span class="fc" id="L121">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L123">        this.buffer.putDouble(value);</span>
+<span class="fc" id="L124">    }</span>
+
+    /**
+     * Writes an Integer/I32 value
+     *
+     * @param value I32 value to serialize
+     */
+    public void writeI32(int value) {
+<span class="fc" id="L132">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L134">        this.buffer.putInt(value);</span>
+<span class="fc" id="L135">    }</span>
+
+    /**
+     * Writes an Unsigned Integer (Long)/U32
+     *
+     * @param value U32 value to serialize
+     */
+    public void writeU32(long value) {
+<span class="fc" id="L143">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L145">        this.buffer.putLong(value);</span>
+<span class="fc" id="L146">    }</span>
+
+    /**
+     * Writes a Long/I64 value
+     *
+     * @param value I64 value to serialize
+     */
+    public void writeI64(long value) {
+<span class="fc" id="L154">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L156">        this.buffer.putLong(value);</span>
+<span class="fc" id="L157">    }</span>
+
+    /**
+     * Writes an Unsigned Long (BigInteger)/U64 to the value byte buffer
+     *
+     * @param value U64 value to serialize
+     *              error with input/output while reading the byte array
+     * @throws ValueSerializationException exception holding information of failure to serialize a value
+     */
+    public void writeU64(BigInteger value) throws ValueSerializationException {
+<span class="fc" id="L167">        requireNonNull(value);</span>
+<span class="fc" id="L168">        checkBoundsFor(value, 64);</span>
+
+<span class="fc" id="L170">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(),</span>
+                value);
+
+<span class="fc" id="L173">        this.buffer.putLong(value.longValue());</span>
+<span class="fc" id="L174">    }</span>
+
+    /**
+     * Writes a BigInteger/U128 to the value byte buffer
+     *
+     * @param value U128 value to serialize
+     *              error with input/output while reading the byte array
+     * @throws ValueSerializationException exception holding information of failure to serialize a value
+     */
+    public void writeU128(BigInteger value) throws ValueSerializationException {
+<span class="fc" id="L184">        writeBigInteger(value, 128);</span>
+<span class="fc" id="L185">    }</span>
+
+    /**
+     * Writes a BigInteger/U256 to the value byte buffer
+     *
+     * @param value U256 value to serialize
+     *              error with input/output while reading the byte array
+     * @throws ValueSerializationException exception holding information of failure to serialize a value
+     */
+    public void writeU256(BigInteger value) throws ValueSerializationException {
+<span class="fc" id="L195">        writeBigInteger(value, 256);</span>
+<span class="fc" id="L196">    }</span>
+
+    /**
+     * Writes a BigInteger/U512 to the value byte buffer
+     *
+     * @param value U512 value to serialize
+     *              error with input/output while reading the byte array
+     * @throws ValueSerializationException exception holding information of failure to serialize a value
+     */
+    public void writeU512(BigInteger value) throws ValueSerializationException {
+<span class="fc" id="L206">        writeBigInteger(value, 512);</span>
+<span class="fc" id="L207">    }</span>
+
+    /**
+     * Writes a BigInteger/U128-U256-U512 to the value byte buffer
+     *
+     * @param value BigInteger to serialize
+     * @param size  the bit size of BigInteger
+     *              error with input/output while reading the byte array
+     * @throws ValueSerializationException exception holding information of failure to serialize a value
+     */
+    protected void writeBigInteger(BigInteger value, int size) throws ValueSerializationException {
+<span class="fc" id="L218">        requireNonNull(value);</span>
+<span class="fc" id="L219">        checkBoundsFor(value, size);</span>
+
+<span class="fc" id="L221">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L223">        byte bigIntegerLength = (byte) (Math.ceil(value.bitLength() / 8.0));</span>
+
+<span class="fc" id="L225">        byte[] byteArray = value.toByteArray();</span>
+
+<span class="fc" id="L227">        int skipped = 0;</span>
+<span class="fc" id="L228">        boolean skip = true;</span>
+<span class="fc bfc" id="L229" title="All 2 branches covered.">        for (byte b : byteArray) {</span>
+<span class="fc bfc" id="L230" title="All 2 branches covered.">            boolean signByte = b == (byte) 0x00;</span>
+<span class="fc bfc" id="L231" title="All 4 branches covered.">            if (skip &amp;&amp; signByte) {</span>
+<span class="fc" id="L232">                skipped++;</span>
+<span class="fc bfc" id="L233" title="All 2 branches covered.">            } else if (skip) {</span>
+<span class="fc" id="L234">                skip = false;</span>
+            }
+        }
+
+<span class="fc" id="L238">        byte[] bigIntegerBytes = Arrays.copyOfRange(byteArray, skipped, byteArray.length);</span>
+
+<span class="fc bfc" id="L240" title="All 2 branches covered.">        if (this.buffer.order() == ByteOrder.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L241">            ByteUtils.reverse(bigIntegerBytes);</span>
+        }
+
+<span class="fc" id="L244">        this.buffer.put(bigIntegerLength);</span>
+<span class="fc" id="L245">        this.buffer.put(bigIntegerBytes);</span>
+<span class="fc" id="L246">    }</span>
+
+    /**
+     * Writes a String to the value byte buffer
+     *
+     * @param value String value to serialize
+     *              error with input/output while reading the byte array
+     */
+    public void writeString(String value) {
+<span class="fc" id="L255">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, String.class.getSimpleName(), value);</span>
+
+<span class="fc" id="L257">        this.buffer.putInt(value.length());</span>
+<span class="fc" id="L258">        this.buffer.put(value.getBytes());</span>
+<span class="fc" id="L259">    }</span>
+
+    /**
+     * Checks if the value is within valid bounds for given CLType
+     *
+     * @param value the value to check
+     * @param size  the bit size to check against
+     * @throws ValueSerializationException exception holding information of failure to serialize a value
+     */
+    private void checkBoundsFor(BigInteger value, int size) throws ValueSerializationException {
+        BigInteger max;
+<span class="fc bfc" id="L270" title="All 2 branches covered.">        if (size == 64) {</span>
+<span class="fc" id="L271">            max = MAX_U64;</span>
+<span class="fc bfc" id="L272" title="All 2 branches covered.">        } else if (size == 128) {</span>
+<span class="fc" id="L273">            max = MAX_U128;</span>
+<span class="fc bfc" id="L274" title="All 2 branches covered.">        } else if (size == 256) {</span>
+<span class="fc" id="L275">            max = MAX_U256;</span>
+<span class="pc bpc" id="L276" title="1 of 2 branches missed.">        } else if (size == 512) {</span>
+<span class="fc" id="L277">            max = MAX_U512;</span>
+        } else {
+<span class="nc" id="L279">            throw new ValueSerializationException(&quot;Error checking numeric bounds&quot;, new NoSuchTypeException(</span>
+<span class="nc" id="L280">                    String.format(&quot;%s is not a numeric size with check bounds for serializing&quot;, size)));</span>
+        }
+
+<span class="pc bpc" id="L283" title="1 of 4 branches missed.">        if (value.compareTo(max) &gt; 0 || value.compareTo(ZERO) &lt; 0) {</span>
+<span class="fc" id="L284">            throw new ValueSerializationException(String.format(SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING,</span>
+<span class="fc" id="L285">                    value, size));</span>
+        }
+<span class="fc" id="L287">    }</span>
+
+    /**
+     * Retrieves the backing buffer
+     *
+     * @return the Deserializer ByteBuffer
+     */
+    public ByteBuffer getBuffer() {
+<span class="nc" id="L295">        return this.buffer;</span>
+    }
+
+    /**
+     * Gets the full byte array corresponding to serialized data
+     *
+     * @return the byte array serialized data
+     */
+    public byte[] toByteArray() {
+<span class="fc" id="L304">        return Arrays.copyOfRange(this.buffer.array(),</span>
+<span class="fc" id="L305">                this.buffer.arrayOffset(), this.buffer.arrayOffset() + this.buffer.position());</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
