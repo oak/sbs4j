@@ -228,7 +228,7 @@
 <a class="jxr_linenumber" name="L220" href="#L220">220</a> 
 <a class="jxr_linenumber" name="L221" href="#L221">221</a>         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.<strong class="jxr_keyword">class</strong>.getSimpleName(), value);
 <a class="jxr_linenumber" name="L222" href="#L222">222</a> 
-<a class="jxr_linenumber" name="L223" href="#L223">223</a>         byte bigIntegerLength = (byte) (Math.ceil(value.add(BigInteger.ONE).bitLength() / 8.0));
+<a class="jxr_linenumber" name="L223" href="#L223">223</a>         byte bigIntegerLength = (byte) (Math.ceil(value.bitLength() / 8.0));
 <a class="jxr_linenumber" name="L224" href="#L224">224</a> 
 <a class="jxr_linenumber" name="L225" href="#L225">225</a>         byte[] byteArray = value.toByteArray();
 <a class="jxr_linenumber" name="L226" href="#L226">226</a> 

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -19,10 +20,10 @@ public class DeserializerBuffer {
 
     private final ByteBuffer buffer;
 
-<span class="fc" id="L22">    private static final Logger LOGGER = LoggerFactory.getLogger(DeserializerBuffer.class);</span>
+<span class="fc" id="L23">    private static final Logger LOGGER = LoggerFactory.getLogger(DeserializerBuffer.class);</span>
 
-    private static final String LOG_BUFFER_INIT_MESSAGE_HEX_STRING = &quot;Initializing with hexString: {} and byte order {}&quot;;
-    private static final String LOG_BUFFER_INIT_MESSAGE = &quot;Initializing with bytes: {} and byte order {}&quot;;
+    private static final String LOG_BUFFER_INIT_MESSAGE_HEX_STRING = &quot;Initializing DeserializerBuffer with hexString: {} and byte order {}&quot;;
+    private static final String LOG_BUFFER_INIT_MESSAGE = &quot;Initializing DeserializerBuffer with bytes: {} and byte order {}&quot;;
     private static final String LOG_BUFFER_VALUE_MESSAGE_STRING = &quot;Buffer value: {}&quot;;
     private static final String LOG_SERIALIZED_VALUE_MESSAGE_STRING = &quot;Deserialized value for {}: {}&quot;;
     private static final String SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING = &quot;Value %s out of bounds for expected type %s&quot;;
@@ -33,8 +34,8 @@ public class DeserializerBuffer {
      * @param hexString hex-encoded {@link String} to deserialize and read from
      */
     public DeserializerBuffer(String hexString) {
-<span class="fc bfc" id="L36" title="All 2 branches covered.">        this(hexString.length() != 0 ? new BigInteger(hexString, 16).toByteArray() : new byte[]{});</span>
-<span class="fc" id="L37">    }</span>
+<span class="fc bfc" id="L37" title="All 2 branches covered.">        this(hexString.length() != 0 ? ByteUtils.parseHexString(hexString) : new byte[]{});</span>
+<span class="fc" id="L38">    }</span>
 
     /**
      * Initializes buffer with serialized bytes from hex-encoded {@link String}
@@ -43,10 +44,10 @@ public class DeserializerBuffer {
      * @param byteOrder the byte order to be using
      */
     public DeserializerBuffer(String hexString, ByteOrder byteOrder) {
-<span class="nc bnc" id="L46" title="All 2 branches missed.">        this(hexString.length() != 0 ? new BigInteger(hexString, 16).toByteArray() : new byte[]{}, byteOrder);</span>
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        this(hexString.length() != 0 ? ByteUtils.parseHexString(hexString) : new byte[]{}, byteOrder);</span>
 
-<span class="nc" id="L48">        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_HEX_STRING, hexString, byteOrder);</span>
-<span class="nc" id="L49">    }</span>
+<span class="nc" id="L49">        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_HEX_STRING, hexString, byteOrder);</span>
+<span class="nc" id="L50">    }</span>
 
     /**
      * Initializes buffer with serialized bytes and {@link ByteOrder#LITTLE_ENDIAN}
@@ -54,8 +55,8 @@ public class DeserializerBuffer {
      * @param bytes byte array to deserialize and read from
      */
     public DeserializerBuffer(byte[] bytes) {
-<span class="fc" id="L57">        this(bytes, ByteOrder.LITTLE_ENDIAN);</span>
-<span class="fc" id="L58">    }</span>
+<span class="fc" id="L58">        this(bytes, ByteOrder.LITTLE_ENDIAN);</span>
+<span class="fc" id="L59">    }</span>
 
     /**
      * Initializes buffer with serialized bytes and byte order
@@ -63,13 +64,13 @@ public class DeserializerBuffer {
      * @param bytes     byte array to deserialize and read from
      * @param byteOrder the byte order to be using
      */
-<span class="fc" id="L66">    public DeserializerBuffer(byte[] bytes, ByteOrder byteOrder) {</span>
-<span class="fc" id="L67">        this.buffer = ByteBuffer.wrap(bytes);</span>
-<span class="fc" id="L68">        this.buffer.order(byteOrder);</span>
-<span class="fc" id="L69">        this.buffer.mark();</span>
+<span class="fc" id="L67">    public DeserializerBuffer(byte[] bytes, ByteOrder byteOrder) {</span>
+<span class="fc" id="L68">        this.buffer = ByteBuffer.wrap(bytes);</span>
+<span class="fc" id="L69">        this.buffer.order(byteOrder);</span>
+<span class="fc" id="L70">        this.buffer.mark();</span>
 
-<span class="fc" id="L71">        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE, Arrays.toString(bytes), byteOrder);</span>
-<span class="fc" id="L72">    }</span>
+<span class="fc" id="L72">        LOGGER.debug(LOG_BUFFER_INIT_MESSAGE, Arrays.toString(bytes), byteOrder);</span>
+<span class="fc" id="L73">    }</span>
 
     /**
      * Reads a Boolean value
@@ -78,17 +79,21 @@ public class DeserializerBuffer {
      * @throws ValueDeserializationException exception holding information of failure to deserialize a value
      */
     public Boolean readBool() throws ValueDeserializationException {
-<span class="fc" id="L81">        byte buf = this.buffer.get();</span>
+        try {
+<span class="fc" id="L83">            byte buf = this.buffer.get();</span>
 
-<span class="fc" id="L83">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
+<span class="fc" id="L85">            LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
 
-<span class="pc bpc" id="L85" title="1 of 2 branches missed.">        if (buf == 1) {</span>
-<span class="fc" id="L86">            return true;</span>
-<span class="nc bnc" id="L87" title="All 2 branches missed.">        } else if (buf == 0) {</span>
-<span class="nc" id="L88">            return false;</span>
-        } else {
-<span class="nc" id="L90">            throw new ValueDeserializationException(</span>
-<span class="nc" id="L91">                    String.format(SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING, buf, Boolean.class.getSimpleName()));</span>
+<span class="pc bpc" id="L87" title="1 of 2 branches missed.">            if (buf == 1) {</span>
+<span class="fc" id="L88">                return true;</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            } else if (buf == 0) {</span>
+<span class="nc" id="L90">                return false;</span>
+            } else {
+<span class="nc" id="L92">                throw new ValueDeserializationException(</span>
+<span class="nc" id="L93">                        String.format(SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING, buf, Boolean.class.getSimpleName()));</span>
+            }
+<span class="fc" id="L95">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L96">            throw new ValueDeserializationException(&quot;Error while reading boolean from buffer&quot;, bufferUnderflowException);</span>
         }
     }
 
@@ -97,12 +102,16 @@ public class DeserializerBuffer {
      *
      * @return the byte
      */
-    public byte readU8() {
-<span class="fc" id="L101">        byte u8 = this.buffer.get();</span>
+    public byte readU8() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L107">            byte u8 = this.buffer.get();</span>
 
-<span class="fc" id="L103">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), u8);</span>
+<span class="fc" id="L109">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), u8);</span>
 
-<span class="fc" id="L105">        return u8;</span>
+<span class="fc" id="L111">            return u8;</span>
+<span class="nc" id="L112">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="nc" id="L113">            throw new ValueDeserializationException(&quot;Error while reading U8 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -111,12 +120,16 @@ public class DeserializerBuffer {
      * @param length the length of the array
      * @return the byte array as byte[]
      */
-    public byte[] readByteArray(int length) {
-<span class="fc" id="L115">        byte[] bytes = readBytes(length);</span>
+    public byte[] readByteArray(int length) throws ValueDeserializationException {
+        try {
+<span class="fc" id="L125">            byte[] bytes = readBytes(length);</span>
 
-<span class="fc" id="L117">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), bytes);</span>
+<span class="fc" id="L127">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), bytes);</span>
 
-<span class="fc" id="L119">        return bytes;</span>
+<span class="fc" id="L129">            return bytes;</span>
+<span class="fc" id="L130">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L131">            throw new ValueDeserializationException(&quot;Error while reading byte array from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -124,12 +137,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a float
      */
-    public float readF32() {
-<span class="fc" id="L128">        float floatNumber = this.buffer.getFloat();</span>
+    public float readF32() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L142">            float floatNumber = this.buffer.getFloat();</span>
 
-<span class="fc" id="L130">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), floatNumber);</span>
+<span class="fc" id="L144">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), floatNumber);</span>
 
-<span class="fc" id="L132">        return floatNumber;</span>
+<span class="fc" id="L146">            return floatNumber;</span>
+<span class="nc" id="L147">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="nc" id="L148">            throw new ValueDeserializationException(&quot;Error while reading F32 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -137,12 +154,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a double
      */
-    public double readF64() {
-<span class="fc" id="L141">        double doubleNumber = this.buffer.getDouble();</span>
+    public double readF64() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L159">            double doubleNumber = this.buffer.getDouble();</span>
 
-<span class="fc" id="L143">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), doubleNumber);</span>
+<span class="fc" id="L161">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), doubleNumber);</span>
 
-<span class="fc" id="L145">        return doubleNumber;</span>
+<span class="fc" id="L163">            return doubleNumber;</span>
+<span class="nc" id="L164">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="nc" id="L165">            throw new ValueDeserializationException(&quot;Error while reading F64 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -150,12 +171,16 @@ public class DeserializerBuffer {
      *
      * @return the number as an int
      */
-    public int readI32() {
-<span class="fc" id="L154">        int integerNumber = this.buffer.getInt();</span>
+    public int readI32() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L176">            int integerNumber = this.buffer.getInt();</span>
 
-<span class="fc" id="L156">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);</span>
+<span class="fc" id="L178">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);</span>
 
-<span class="fc" id="L158">        return integerNumber;</span>
+<span class="fc" id="L180">            return integerNumber;</span>
+<span class="nc" id="L181">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="nc" id="L182">            throw new ValueDeserializationException(&quot;Error while reading I32 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -163,12 +188,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a long
      */
-    public long readU32() {
-<span class="fc" id="L167">        long unsignedInteger = this.buffer.getLong();</span>
+    public long readU32() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L193">            long unsignedInteger = this.buffer.getLong();</span>
 
-<span class="fc" id="L169">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);</span>
+<span class="fc" id="L195">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);</span>
 
-<span class="fc" id="L171">        return unsignedInteger;</span>
+<span class="fc" id="L197">            return unsignedInteger;</span>
+<span class="fc" id="L198">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L199">            throw new ValueDeserializationException(&quot;Error while reading U32 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -176,12 +205,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a long
      */
-    public long readI64() {
-<span class="fc" id="L180">        long longNumber = this.buffer.getLong();</span>
+    public long readI64() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L210">            long longNumber = this.buffer.getLong();</span>
 
-<span class="fc" id="L182">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), longNumber);</span>
+<span class="fc" id="L212">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), longNumber);</span>
 
-<span class="fc" id="L184">        return longNumber;</span>
+<span class="fc" id="L214">            return longNumber;</span>
+<span class="nc" id="L215">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="nc" id="L216">            throw new ValueDeserializationException(&quot;Error while reading I64 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -189,17 +222,21 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU64() {
-        // Since this is a positive (unsigned) number, we should prefix with a zero
-        // byte to parse correctly
-<span class="fc" id="L195">        ByteBuffer bb = ByteBuffer.allocate(9);</span>
-<span class="fc" id="L196">        bb.put((byte) 0);</span>
-<span class="fc" id="L197">        bb.putLong(this.buffer.getLong());</span>
-<span class="fc" id="L198">        BigInteger unsignedLong = new BigInteger(bb.array());</span>
+    public BigInteger readU64() throws ValueDeserializationException {
+        try {
+            // Since this is a positive (unsigned) number, we should prefix with a zero
+            // byte to parse correctly
+<span class="fc" id="L229">            ByteBuffer bb = ByteBuffer.allocate(9);</span>
+<span class="fc" id="L230">            bb.put((byte) 0);</span>
+<span class="fc" id="L231">            bb.putLong(this.buffer.getLong());</span>
+<span class="fc" id="L232">            BigInteger unsignedLong = new BigInteger(bb.array());</span>
 
-<span class="fc" id="L200">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), unsignedLong);</span>
+<span class="fc" id="L234">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), unsignedLong);</span>
 
-<span class="fc" id="L202">        return unsignedLong;</span>
+<span class="fc" id="L236">            return unsignedLong;</span>
+<span class="fc" id="L237">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L238">            throw new ValueDeserializationException(&quot;Error while reading U64 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -207,8 +244,12 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU128() {
-<span class="fc" id="L211">        return this.readBigInteger();</span>
+    public BigInteger readU128() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L249">            return this.readBigInteger();</span>
+<span class="fc" id="L250">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L251">            throw new ValueDeserializationException(&quot;Error while reading U128 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -216,8 +257,12 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU256() {
-<span class="fc" id="L220">        return this.readBigInteger();</span>
+    public BigInteger readU256() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L262">            return this.readBigInteger();</span>
+<span class="fc" id="L263">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L264">            throw new ValueDeserializationException(&quot;Error while reading U256 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -225,8 +270,12 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU512() {
-<span class="fc" id="L229">        return this.readBigInteger();</span>
+    public BigInteger readU512() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L275">            return this.readBigInteger();</span>
+<span class="fc" id="L276">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L277">            throw new ValueDeserializationException(&quot;Error while reading U512 from buffer&quot;, bufferUnderflowException);</span>
+        }
     }
 
     /**
@@ -237,25 +286,25 @@ public class DeserializerBuffer {
      * @return the number as a BigInteger
      */
     protected BigInteger readBigInteger() {
-<span class="fc" id="L240">        byte lengthOfNextNumber = this.buffer.get();</span>
+<span class="fc" id="L289">        byte lengthOfNextNumber = this.buffer.get();</span>
 
-<span class="fc" id="L242">        LOGGER.debug(&quot;Length of next number: {}&quot;, lengthOfNextNumber);</span>
+<span class="fc" id="L291">        LOGGER.debug(&quot;Length of next number: {}&quot;, lengthOfNextNumber);</span>
 
-<span class="fc" id="L244">        byte[] buf = new byte[lengthOfNextNumber + 1];</span>
+<span class="fc" id="L293">        byte[] buf = new byte[lengthOfNextNumber + 1];</span>
 
-<span class="fc" id="L246">        this.buffer.get(buf, 1, lengthOfNextNumber);</span>
+<span class="fc" id="L295">        this.buffer.get(buf, 1, lengthOfNextNumber);</span>
 
-<span class="fc" id="L248">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
+<span class="fc" id="L297">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
 
-<span class="fc bfc" id="L250" title="All 2 branches covered.">        if (this.buffer.order() == ByteOrder.LITTLE_ENDIAN) {</span>
-<span class="fc" id="L251">            ByteUtils.reverse(buf, 1, buf.length - 1);</span>
+<span class="fc bfc" id="L299" title="All 2 branches covered.">        if (this.buffer.order() == ByteOrder.LITTLE_ENDIAN) {</span>
+<span class="fc" id="L300">            ByteUtils.reverse(buf, 1, buf.length - 1);</span>
         }
 
-<span class="fc" id="L254">        BigInteger bigInt = new BigInteger(buf);</span>
+<span class="fc" id="L303">        BigInteger bigInt = new BigInteger(buf);</span>
 
-<span class="fc" id="L256">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), bigInt);</span>
+<span class="fc" id="L305">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), bigInt);</span>
 
-<span class="fc" id="L258">        return bigInt;</span>
+<span class="fc" id="L307">        return bigInt;</span>
     }
 
     /**
@@ -263,22 +312,36 @@ public class DeserializerBuffer {
      *
      * @return the String read
      */
-    public String readString() {
-<span class="fc" id="L267">        int length = this.buffer.getInt();</span>
+    public String readString() throws ValueDeserializationException {
+        try {
+<span class="fc" id="L317">            int length = this.buffer.getInt();</span>
 
-<span class="fc" id="L269">        LOGGER.debug(&quot;Reading string of length: {}&quot;, length);</span>
+<span class="fc" id="L319">            LOGGER.debug(&quot;Reading string of length: {}&quot;, length);</span>
 
-<span class="fc" id="L271">        byte[] bufString = new byte[length];</span>
+<span class="fc" id="L321">            byte[] bufString = new byte[length];</span>
 
-<span class="fc" id="L273">        this.buffer.get(bufString, 0, length);</span>
+<span class="fc" id="L323">            this.buffer.get(bufString, 0, length);</span>
 
-<span class="fc" id="L275">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, bufString);</span>
+<span class="fc" id="L325">            LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, bufString);</span>
 
-<span class="fc" id="L277">        String string = new String(bufString);</span>
+<span class="fc" id="L327">            String string = new String(bufString);</span>
 
-<span class="fc" id="L279">        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, String.class.getSimpleName(), string);</span>
+<span class="fc" id="L329">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, String.class.getSimpleName(), string);</span>
 
-<span class="fc" id="L281">        return string;</span>
+<span class="fc" id="L331">            return string;</span>
+<span class="fc" id="L332">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
+<span class="fc" id="L333">            throw new ValueDeserializationException(&quot;Error while reading String from buffer&quot;, bufferUnderflowException);</span>
+        }
+
+    }
+
+    /**
+     * Retrieves the backing buffer
+     *
+     * @return the Deserializer ByteBuffer
+     */
+    public ByteBuffer getBuffer() {
+<span class="nc" id="L344">        return this.buffer;</span>
     }
 
     /**
@@ -288,13 +351,13 @@ public class DeserializerBuffer {
      * @return bytes read
      */
     protected byte[] readBytes(int length) {
-<span class="fc" id="L291">        byte[] buf = new byte[length];</span>
+<span class="fc" id="L354">        byte[] buf = new byte[length];</span>
 
-<span class="fc" id="L293">        this.buffer.get(buf, 0, length);</span>
+<span class="fc" id="L356">        this.buffer.get(buf, 0, length);</span>
 
-<span class="fc" id="L295">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
+<span class="fc" id="L358">        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);</span>
 
-<span class="fc" id="L297">        return buf;</span>
+<span class="fc" id="L360">        return buf;</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
