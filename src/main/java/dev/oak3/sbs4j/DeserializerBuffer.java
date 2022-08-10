@@ -175,7 +175,7 @@ public class DeserializerBuffer {
         try {
             int integerNumber = this.buffer.getInt();
 
-            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), integerNumber);
 
             return integerNumber;
         } catch (BufferUnderflowException bufferUnderflowException) {
@@ -190,11 +190,11 @@ public class DeserializerBuffer {
      */
     public long readU32() throws ValueDeserializationException {
         try {
-            long unsignedInteger = this.buffer.getLong();
+            int signedInteger = this.buffer.getInt();
+            long unsignedIntegerLong = Integer.toUnsignedLong(signedInteger);
 
-            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);
-
-            return unsignedInteger;
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedIntegerLong);
+            return unsignedIntegerLong;
         } catch (BufferUnderflowException bufferUnderflowException) {
             throw new ValueDeserializationException("Error while reading U32 from buffer", bufferUnderflowException);
         }

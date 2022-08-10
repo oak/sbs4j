@@ -139,10 +139,10 @@ public class SerializerBuffer {
      *
      * @param value U32 value to serialize
      */
-    public void writeU32(long value) {
-        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), value);
+    public void writeU32(Long value) {
+        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);
 
-        this.buffer.putLong(value);
+        this.buffer.putInt(value.intValue());
     }
 
     /**

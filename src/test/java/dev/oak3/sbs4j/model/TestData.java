@@ -107,7 +107,7 @@ public class TestData<T> {
             new TestData<>(BOOLEAN, true, new byte[]{1}, new byte[]{1}),
             new TestData<>(U_8, Byte.valueOf("7"), new byte[]{7}, new byte[]{7}),
             new TestData<>(BYTE_ARRAY, new byte[]{'s', 'b', 's', '4', 'j'}, new byte[]{115, 98, 115, 52, 106}, new byte[]{115, 98, 115, 52, 106}),
-            new TestData<>(U_32, 7L, new byte[]{7, 0, 0, 0, 0, 0, 0, 0}, new byte[]{0, 0, 0, 0, 0, 0, 0, 7}),
+            new TestData<>(U_32, 7L, new byte[]{7, 0, 0, 0}, new byte[]{0, 0, 0, 7}),
             new TestData<>(I_32, 7, new byte[]{7, 0, 0, 0}, new byte[]{0, 0, 0, 7}),
             new TestData<>(F_32, (float) 5, new byte[]{0, 0, -96, 64}, new byte[]{64, -96, 0, 0}),
             new TestData<>(F_64, (double) 5, new byte[]{0, 0, 0, 0, 0, 0, 20, 64}, new byte[]{64, 20, 0, 0, 0, 0, 0, 0}),
