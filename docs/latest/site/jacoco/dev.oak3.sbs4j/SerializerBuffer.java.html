@@ -287,13 +287,22 @@ public class SerializerBuffer {
 <span class="fc" id="L287">    }</span>
 
     /**
+     * Retrieves the backing buffer
+     *
+     * @return the Deserializer ByteBuffer
+     */
+    public ByteBuffer getBuffer() {
+<span class="nc" id="L295">        return this.buffer;</span>
+    }
+
+    /**
      * Gets the full byte array corresponding to serialized data
      *
      * @return the byte array serialized data
      */
     public byte[] toByteArray() {
-<span class="fc" id="L295">        return Arrays.copyOfRange(this.buffer.array(),</span>
-<span class="fc" id="L296">                this.buffer.arrayOffset(), this.buffer.arrayOffset() + this.buffer.position());</span>
+<span class="fc" id="L304">        return Arrays.copyOfRange(this.buffer.array(),</span>
+<span class="fc" id="L305">                this.buffer.arrayOffset(), this.buffer.arrayOffset() + this.buffer.position());</span>
     }
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
