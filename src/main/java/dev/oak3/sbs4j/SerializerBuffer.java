@@ -287,6 +287,15 @@ public class SerializerBuffer {
     }
 
     /**
+     * Retrieves the backing buffer
+     *
+     * @return the Deserializer ByteBuffer
+     */
+    public ByteBuffer getBuffer() {
+        return this.buffer;
+    }
+
+    /**
      * Gets the full byte array corresponding to serialized data
      *
      * @return the byte array serialized data
