@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ByteUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">dev.oak3:sbs4j</a> &gt; <a href="index.source.html" class="el_package">dev.oak3.sbs4j.util</a> &gt; <span class="el_source">ByteUtils.java</span></div><h1>ByteUtils.java</h1><pre class="source lang-java linenums">package dev.oak3.sbs4j.util;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Utilities class for Byte related operations
+ *
+ * @since 0.1.0
+ */
+<span class="nc" id="L11">public final class ByteUtils {</span>
+<span class="fc" id="L12">    private static final Logger LOGGER = LoggerFactory.getLogger(ByteUtils.class);</span>
+
+    /**
+     * Hex string code case selector
+     */
+<span class="nc" id="L17">    public enum HexCase {</span>
+<span class="nc" id="L18">        LOWER(&quot;0123456789abcdef&quot;.toCharArray()),</span>
+<span class="nc" id="L19">        UPPER(&quot;0123456789ABCDEF&quot;.toCharArray());</span>
+
+        private final char[] hexCodes;
+
+        public char[] getHexCodes() {
+<span class="nc" id="L24">            return this.hexCodes;</span>
+        }
+
+<span class="nc" id="L27">        HexCase(char[] hexCodes) {</span>
+<span class="nc" id="L28">            this.hexCodes = hexCodes;</span>
+<span class="nc" id="L29">        }</span>
+    }
+
+    /**
+     * Reverses a byte array, used to change endian
+     *
+     * @param bytes array of bytes to reverse
+     */
+    public static void reverse(byte[] bytes) {
+<span class="fc" id="L38">        reverse(bytes, 0, bytes.length - 1);</span>
+<span class="fc" id="L39">    }</span>
+
+    /**
+     * Reverses a byte array, used to change endian
+     *
+     * @param bytes array of bytes to reverse
+     * @param from  first byte position to swap
+     * @param to    last byte position to swap
+     */
+    public static void reverse(byte[] bytes, int from, int to) {
+<span class="fc" id="L49">        LOGGER.debug(&quot;Reversing {}&quot;, bytes);</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (int i = from; i &lt; Math.abs((to - from) / 2f) + from; i++) {</span>
+<span class="fc" id="L51">            byte temp = bytes[i];</span>
+<span class="fc" id="L52">            bytes[i] = bytes[to - i + from];</span>
+<span class="fc" id="L53">            bytes[to - i + from] = temp;</span>
+        }
+<span class="fc" id="L55">        LOGGER.debug(&quot;Reversed {}&quot;, bytes);</span>
+<span class="fc" id="L56">    }</span>
+
+    /**
+     * Parses a hex string to byte array
+     *
+     * @param hexString the hex string to parse
+     * @return the encoded byte array
+     * @throws IllegalArgumentException thrown if hexString is invalid
+     */
+    public static byte[] parseHexString(String hexString) throws IllegalArgumentException {
+<span class="fc" id="L66">        final int len = hexString.length();</span>
+
+        // &quot;111&quot; is not a valid hex encoding.
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">        if (len % 2 != 0)</span>
+<span class="nc" id="L70">            throw new IllegalArgumentException(&quot;hexBinary needs to be even-length: &quot; + hexString);</span>
+
+<span class="fc" id="L72">        byte[] out = new byte[len / 2];</span>
+
+<span class="fc bfc" id="L74" title="All 2 branches covered.">        for (int i = 0; i &lt; len; i += 2) {</span>
+<span class="fc" id="L75">            int h = hexToByte(hexString.charAt(i));</span>
+<span class="fc" id="L76">            int l = hexToByte(hexString.charAt(i + 1));</span>
+<span class="pc bpc" id="L77" title="2 of 4 branches missed.">            if (h == -1 || l == -1)</span>
+<span class="nc" id="L78">                throw new IllegalArgumentException(&quot;contains illegal character for hexBinary: &quot; + hexString);</span>
+
+<span class="fc" id="L80">            out[i / 2] = (byte) (h * 16 + l);</span>
+        }
+
+<span class="fc" id="L83">        return out;</span>
+    }
+
+    /**
+     * Converts hex characters to int value of byte
+     *
+     * @param charToConvert the char to convert to byte
+     * @return the int value of the converted byte
+     */
+    private static int hexToByte(char charToConvert) {
+<span class="pc bpc" id="L93" title="2 of 4 branches missed.">        if ('0' &lt;= charToConvert &amp;&amp; charToConvert &lt;= '9') return charToConvert - '0';</span>
+<span class="nc bnc" id="L94" title="All 4 branches missed.">        if ('A' &lt;= charToConvert &amp;&amp; charToConvert &lt;= 'F') return charToConvert - 'A' + 10;</span>
+<span class="nc bnc" id="L95" title="All 4 branches missed.">        if ('a' &lt;= charToConvert &amp;&amp; charToConvert &lt;= 'f') return charToConvert - 'a' + 10;</span>
+<span class="nc" id="L96">        return -1;</span>
+    }
+
+    /**
+     * Encodes a byte array to an hex string in lower case as default
+     *
+     * @param byteArray the byte array to encode
+     * @return the encoded hex string
+     */
+    public static String encodeHexString(byte[] byteArray) {
+<span class="nc" id="L106">        return encodeHexString(byteArray, HexCase.LOWER);</span>
+    }
+
+    /**
+     * Encodes a byte array to an hex string
+     *
+     * @param byteArray the byte array to encode
+     * @param hexCase upper or lower hex code case to use
+     * @return the encoded hex string
+     */
+    public static String encodeHexString(byte[] byteArray, HexCase hexCase) {
+<span class="nc" id="L117">        StringBuilder r = new StringBuilder(byteArray.length * 2);</span>
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        for (byte b : byteArray) {</span>
+<span class="nc" id="L119">            r.append(hexCase.getHexCodes()[(b &gt;&gt; 4) &amp; 0xF]);</span>
+<span class="nc" id="L120">            r.append(hexCase.getHexCodes()[(b &amp; 0xF)]);</span>
+        }
+<span class="nc" id="L122">        return r.toString();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
