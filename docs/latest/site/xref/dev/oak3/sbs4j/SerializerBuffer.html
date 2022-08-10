@@ -147,10 +147,10 @@
 <a class="jxr_linenumber" name="L139" href="#L139">139</a> <em class="jxr_javadoccomment">     *</em>
 <a class="jxr_linenumber" name="L140" href="#L140">140</a> <em class="jxr_javadoccomment">     * @param value U32 value to serialize</em>
 <a class="jxr_linenumber" name="L141" href="#L141">141</a> <em class="jxr_javadoccomment">     */</em>
-<a class="jxr_linenumber" name="L142" href="#L142">142</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeU32(<strong class="jxr_keyword">long</strong> value) {
-<a class="jxr_linenumber" name="L143" href="#L143">143</a>         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.<strong class="jxr_keyword">class</strong>.getSimpleName(), value);
+<a class="jxr_linenumber" name="L142" href="#L142">142</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">void</strong> writeU32(Long value) {
+<a class="jxr_linenumber" name="L143" href="#L143">143</a>         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.<strong class="jxr_keyword">class</strong>.getSimpleName(), value);
 <a class="jxr_linenumber" name="L144" href="#L144">144</a> 
-<a class="jxr_linenumber" name="L145" href="#L145">145</a>         <strong class="jxr_keyword">this</strong>.buffer.putLong(value);
+<a class="jxr_linenumber" name="L145" href="#L145">145</a>         <strong class="jxr_keyword">this</strong>.buffer.putInt(value.intValue());
 <a class="jxr_linenumber" name="L146" href="#L146">146</a>     }
 <a class="jxr_linenumber" name="L147" href="#L147">147</a> 
 <a class="jxr_linenumber" name="L148" href="#L148">148</a>     <em class="jxr_javadoccomment">/**</em>

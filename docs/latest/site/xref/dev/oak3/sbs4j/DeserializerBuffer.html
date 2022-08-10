@@ -183,7 +183,7 @@
 <a class="jxr_linenumber" name="L175" href="#L175">175</a>         <strong class="jxr_keyword">try</strong> {
 <a class="jxr_linenumber" name="L176" href="#L176">176</a>             <strong class="jxr_keyword">int</strong> integerNumber = <strong class="jxr_keyword">this</strong>.buffer.getInt();
 <a class="jxr_linenumber" name="L177" href="#L177">177</a> 
-<a class="jxr_linenumber" name="L178" href="#L178">178</a>             LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.<strong class="jxr_keyword">class</strong>.getSimpleName(), integerNumber);
+<a class="jxr_linenumber" name="L178" href="#L178">178</a>             LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.<strong class="jxr_keyword">class</strong>.getSimpleName(), integerNumber);
 <a class="jxr_linenumber" name="L179" href="#L179">179</a> 
 <a class="jxr_linenumber" name="L180" href="#L180">180</a>             <strong class="jxr_keyword">return</strong> integerNumber;
 <a class="jxr_linenumber" name="L181" href="#L181">181</a>         } <strong class="jxr_keyword">catch</strong> (BufferUnderflowException bufferUnderflowException) {
@@ -198,11 +198,11 @@
 <a class="jxr_linenumber" name="L190" href="#L190">190</a> <em class="jxr_javadoccomment">     */</em>
 <a class="jxr_linenumber" name="L191" href="#L191">191</a>     <strong class="jxr_keyword">public</strong> <strong class="jxr_keyword">long</strong> readU32() <strong class="jxr_keyword">throws</strong> <a name="ValueDeserializationException" href="../../../dev/oak3/sbs4j/exception/ValueDeserializationException.html#ValueDeserializationException">ValueDeserializationException</a> {
 <a class="jxr_linenumber" name="L192" href="#L192">192</a>         <strong class="jxr_keyword">try</strong> {
-<a class="jxr_linenumber" name="L193" href="#L193">193</a>             <strong class="jxr_keyword">long</strong> unsignedInteger = <strong class="jxr_keyword">this</strong>.buffer.getLong();
-<a class="jxr_linenumber" name="L194" href="#L194">194</a> 
-<a class="jxr_linenumber" name="L195" href="#L195">195</a>             LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.<strong class="jxr_keyword">class</strong>.getSimpleName(), unsignedInteger);
-<a class="jxr_linenumber" name="L196" href="#L196">196</a> 
-<a class="jxr_linenumber" name="L197" href="#L197">197</a>             <strong class="jxr_keyword">return</strong> unsignedInteger;
+<a class="jxr_linenumber" name="L193" href="#L193">193</a>             <strong class="jxr_keyword">int</strong> signedInteger = <strong class="jxr_keyword">this</strong>.buffer.getInt();
+<a class="jxr_linenumber" name="L194" href="#L194">194</a>             <strong class="jxr_keyword">long</strong> unsignedIntegerLong = Integer.toUnsignedLong(signedInteger);
+<a class="jxr_linenumber" name="L195" href="#L195">195</a> 
+<a class="jxr_linenumber" name="L196" href="#L196">196</a>             LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.<strong class="jxr_keyword">class</strong>.getSimpleName(), unsignedIntegerLong);
+<a class="jxr_linenumber" name="L197" href="#L197">197</a>             <strong class="jxr_keyword">return</strong> unsignedIntegerLong;
 <a class="jxr_linenumber" name="L198" href="#L198">198</a>         } <strong class="jxr_keyword">catch</strong> (BufferUnderflowException bufferUnderflowException) {
 <a class="jxr_linenumber" name="L199" href="#L199">199</a>             <strong class="jxr_keyword">throw</strong> <strong class="jxr_keyword">new</strong> <a name="ValueDeserializationException" href="../../../dev/oak3/sbs4j/exception/ValueDeserializationException.html#ValueDeserializationException">ValueDeserializationException</a>(<span class="jxr_string">"Error while reading U32 from buffer"</span>, bufferUnderflowException);
 <a class="jxr_linenumber" name="L200" href="#L200">200</a>         }

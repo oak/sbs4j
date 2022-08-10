@@ -175,7 +175,7 @@ public class DeserializerBuffer {
         try {
 <span class="fc" id="L176">            int integerNumber = this.buffer.getInt();</span>
 
-<span class="fc" id="L178">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);</span>
+<span class="fc" id="L178">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), integerNumber);</span>
 
 <span class="fc" id="L180">            return integerNumber;</span>
 <span class="nc" id="L181">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
@@ -190,11 +190,11 @@ public class DeserializerBuffer {
      */
     public long readU32() throws ValueDeserializationException {
         try {
-<span class="fc" id="L193">            long unsignedInteger = this.buffer.getLong();</span>
+<span class="fc" id="L193">            int signedInteger = this.buffer.getInt();</span>
+<span class="fc" id="L194">            long unsignedIntegerLong = Integer.toUnsignedLong(signedInteger);</span>
 
-<span class="fc" id="L195">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);</span>
-
-<span class="fc" id="L197">            return unsignedInteger;</span>
+<span class="fc" id="L196">            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedIntegerLong);</span>
+<span class="fc" id="L197">            return unsignedIntegerLong;</span>
 <span class="fc" id="L198">        } catch (BufferUnderflowException bufferUnderflowException) {</span>
 <span class="fc" id="L199">            throw new ValueDeserializationException(&quot;Error while reading U32 from buffer&quot;, bufferUnderflowException);</span>
         }

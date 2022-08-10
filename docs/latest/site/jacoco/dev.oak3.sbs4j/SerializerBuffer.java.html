@@ -139,10 +139,10 @@ public class SerializerBuffer {
      *
      * @param value U32 value to serialize
      */
-    public void writeU32(long value) {
-<span class="fc" id="L143">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), value);</span>
+    public void writeU32(Long value) {
+<span class="fc" id="L143">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L145">        this.buffer.putLong(value);</span>
+<span class="fc" id="L145">        this.buffer.putInt(value.intValue());</span>
 <span class="fc" id="L146">    }</span>
 
     /**
