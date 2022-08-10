@@ -2,6 +2,7 @@ package dev.oak3.sbs4j.model;
 
 import dev.oak3.sbs4j.DeserializerBuffer;
 import dev.oak3.sbs4j.SerializerBuffer;
+import dev.oak3.sbs4j.exception.ValueDeserializationException;
 import dev.oak3.sbs4j.interfaces.DeserializableObject;
 import dev.oak3.sbs4j.interfaces.SerializableObject;
 
@@ -40,7 +41,7 @@ public class Point implements SerializableObject, DeserializableObject {
     }
 
     @Override
-    public void deserialize(DeserializerBuffer deserializer) {
+    public void deserialize(DeserializerBuffer deserializer) throws ValueDeserializationException {
         // ...defines the read order
         this.x = deserializer.readI32();
         this.y = deserializer.readI32();

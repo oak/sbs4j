@@ -220,7 +220,7 @@ public class SerializerBuffer {
 
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), value);
 
-        byte bigIntegerLength = (byte) (Math.ceil(value.add(BigInteger.ONE).bitLength() / 8.0));
+        byte bigIntegerLength = (byte) (Math.ceil(value.bitLength() / 8.0));
 
         byte[] byteArray = value.toByteArray();
 

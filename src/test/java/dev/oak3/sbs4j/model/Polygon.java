@@ -2,6 +2,7 @@ package dev.oak3.sbs4j.model;
 
 import dev.oak3.sbs4j.DeserializerBuffer;
 import dev.oak3.sbs4j.SerializerBuffer;
+import dev.oak3.sbs4j.exception.ValueDeserializationException;
 import dev.oak3.sbs4j.interfaces.DeserializableObject;
 import dev.oak3.sbs4j.interfaces.SerializableObject;
 
@@ -36,7 +37,7 @@ public class Polygon implements SerializableObject, DeserializableObject {
     }
 
     @Override
-    public void deserialize(DeserializerBuffer deserializerBuffer) {
+    public void deserialize(DeserializerBuffer deserializerBuffer) throws ValueDeserializationException {
         int length = deserializerBuffer.readI32();
         this.vertices = new ArrayList<>();
         for (int i = 0; i < length; i++) {

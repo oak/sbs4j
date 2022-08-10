@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
@@ -21,8 +22,8 @@ public class DeserializerBuffer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DeserializerBuffer.class);
 
-    private static final String LOG_BUFFER_INIT_MESSAGE_HEX_STRING = "Initializing with hexString: {} and byte order {}";
-    private static final String LOG_BUFFER_INIT_MESSAGE = "Initializing with bytes: {} and byte order {}";
+    private static final String LOG_BUFFER_INIT_MESSAGE_HEX_STRING = "Initializing DeserializerBuffer with hexString: {} and byte order {}";
+    private static final String LOG_BUFFER_INIT_MESSAGE = "Initializing DeserializerBuffer with bytes: {} and byte order {}";
     private static final String LOG_BUFFER_VALUE_MESSAGE_STRING = "Buffer value: {}";
     private static final String LOG_SERIALIZED_VALUE_MESSAGE_STRING = "Deserialized value for {}: {}";
     private static final String SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING = "Value %s out of bounds for expected type %s";
@@ -33,7 +34,7 @@ public class DeserializerBuffer {
      * @param hexString hex-encoded {@link String} to deserialize and read from
      */
     public DeserializerBuffer(String hexString) {
-        this(hexString.length() != 0 ? new BigInteger(hexString, 16).toByteArray() : new byte[]{});
+        this(hexString.length() != 0 ? ByteUtils.parseHexString(hexString) : new byte[]{});
     }
 
     /**
@@ -43,7 +44,7 @@ public class DeserializerBuffer {
      * @param byteOrder the byte order to be using
      */
     public DeserializerBuffer(String hexString, ByteOrder byteOrder) {
-        this(hexString.length() != 0 ? new BigInteger(hexString, 16).toByteArray() : new byte[]{}, byteOrder);
+        this(hexString.length() != 0 ? ByteUtils.parseHexString(hexString) : new byte[]{}, byteOrder);
 
         LOGGER.debug(LOG_BUFFER_INIT_MESSAGE_HEX_STRING, hexString, byteOrder);
     }
@@ -78,17 +79,21 @@ public class DeserializerBuffer {
      * @throws ValueDeserializationException exception holding information of failure to deserialize a value
      */
     public Boolean readBool() throws ValueDeserializationException {
-        byte buf = this.buffer.get();
+        try {
+            byte buf = this.buffer.get();
 
-        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);
+            LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, buf);
 
-        if (buf == 1) {
-            return true;
-        } else if (buf == 0) {
-            return false;
-        } else {
-            throw new ValueDeserializationException(
-                    String.format(SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING, buf, Boolean.class.getSimpleName()));
+            if (buf == 1) {
+                return true;
+            } else if (buf == 0) {
+                return false;
+            } else {
+                throw new ValueDeserializationException(
+                        String.format(SERIALIZE_EXCEPTION_OUT_OF_BOUNDS_MESSAGE_STRING, buf, Boolean.class.getSimpleName()));
+            }
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading boolean from buffer", bufferUnderflowException);
         }
     }
 
@@ -97,12 +102,16 @@ public class DeserializerBuffer {
      *
      * @return the byte
      */
-    public byte readU8() {
-        byte u8 = this.buffer.get();
+    public byte readU8() throws ValueDeserializationException {
+        try {
+            byte u8 = this.buffer.get();
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), u8);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), u8);
 
-        return u8;
+            return u8;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading U8 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -111,12 +120,16 @@ public class DeserializerBuffer {
      * @param length the length of the array
      * @return the byte array as byte[]
      */
-    public byte[] readByteArray(int length) {
-        byte[] bytes = readBytes(length);
+    public byte[] readByteArray(int length) throws ValueDeserializationException {
+        try {
+            byte[] bytes = readBytes(length);
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), bytes);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), bytes);
 
-        return bytes;
+            return bytes;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading byte array from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -124,12 +137,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a float
      */
-    public float readF32() {
-        float floatNumber = this.buffer.getFloat();
+    public float readF32() throws ValueDeserializationException {
+        try {
+            float floatNumber = this.buffer.getFloat();
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), floatNumber);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), floatNumber);
 
-        return floatNumber;
+            return floatNumber;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading F32 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -137,12 +154,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a double
      */
-    public double readF64() {
-        double doubleNumber = this.buffer.getDouble();
+    public double readF64() throws ValueDeserializationException {
+        try {
+            double doubleNumber = this.buffer.getDouble();
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), doubleNumber);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), doubleNumber);
 
-        return doubleNumber;
+            return doubleNumber;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading F64 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -150,12 +171,16 @@ public class DeserializerBuffer {
      *
      * @return the number as an int
      */
-    public int readI32() {
-        int integerNumber = this.buffer.getInt();
+    public int readI32() throws ValueDeserializationException {
+        try {
+            int integerNumber = this.buffer.getInt();
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), integerNumber);
 
-        return integerNumber;
+            return integerNumber;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading I32 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -163,12 +188,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a long
      */
-    public long readU32() {
-        long unsignedInteger = this.buffer.getLong();
+    public long readU32() throws ValueDeserializationException {
+        try {
+            long unsignedInteger = this.buffer.getLong();
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), unsignedInteger);
 
-        return unsignedInteger;
+            return unsignedInteger;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading U32 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -176,12 +205,16 @@ public class DeserializerBuffer {
      *
      * @return the number as a long
      */
-    public long readI64() {
-        long longNumber = this.buffer.getLong();
+    public long readI64() throws ValueDeserializationException {
+        try {
+            long longNumber = this.buffer.getLong();
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), longNumber);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), longNumber);
 
-        return longNumber;
+            return longNumber;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading I64 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -189,17 +222,21 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU64() {
-        // Since this is a positive (unsigned) number, we should prefix with a zero
-        // byte to parse correctly
-        ByteBuffer bb = ByteBuffer.allocate(9);
-        bb.put((byte) 0);
-        bb.putLong(this.buffer.getLong());
-        BigInteger unsignedLong = new BigInteger(bb.array());
+    public BigInteger readU64() throws ValueDeserializationException {
+        try {
+            // Since this is a positive (unsigned) number, we should prefix with a zero
+            // byte to parse correctly
+            ByteBuffer bb = ByteBuffer.allocate(9);
+            bb.put((byte) 0);
+            bb.putLong(this.buffer.getLong());
+            BigInteger unsignedLong = new BigInteger(bb.array());
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), unsignedLong);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(), unsignedLong);
 
-        return unsignedLong;
+            return unsignedLong;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading U64 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -207,8 +244,12 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU128() {
-        return this.readBigInteger();
+    public BigInteger readU128() throws ValueDeserializationException {
+        try {
+            return this.readBigInteger();
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading U128 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -216,8 +257,12 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU256() {
-        return this.readBigInteger();
+    public BigInteger readU256() throws ValueDeserializationException {
+        try {
+            return this.readBigInteger();
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading U256 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -225,8 +270,12 @@ public class DeserializerBuffer {
      *
      * @return the number as a BigInteger
      */
-    public BigInteger readU512() {
-        return this.readBigInteger();
+    public BigInteger readU512() throws ValueDeserializationException {
+        try {
+            return this.readBigInteger();
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading U512 from buffer", bufferUnderflowException);
+        }
     }
 
     /**
@@ -263,22 +312,36 @@ public class DeserializerBuffer {
      *
      * @return the String read
      */
-    public String readString() {
-        int length = this.buffer.getInt();
+    public String readString() throws ValueDeserializationException {
+        try {
+            int length = this.buffer.getInt();
 
-        LOGGER.debug("Reading string of length: {}", length);
+            LOGGER.debug("Reading string of length: {}", length);
 
-        byte[] bufString = new byte[length];
+            byte[] bufString = new byte[length];
 
-        this.buffer.get(bufString, 0, length);
+            this.buffer.get(bufString, 0, length);
 
-        LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, bufString);
+            LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, bufString);
 
-        String string = new String(bufString);
+            String string = new String(bufString);
 
-        LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, String.class.getSimpleName(), string);
+            LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, String.class.getSimpleName(), string);
 
-        return string;
+            return string;
+        } catch (BufferUnderflowException bufferUnderflowException) {
+            throw new ValueDeserializationException("Error while reading String from buffer", bufferUnderflowException);
+        }
+
+    }
+
+    /**
+     * Retrieves the backing buffer
+     *
+     * @return the Deserializer ByteBuffer
+     */
+    public ByteBuffer getBuffer() {
+        return this.buffer;
     }
 
     /**

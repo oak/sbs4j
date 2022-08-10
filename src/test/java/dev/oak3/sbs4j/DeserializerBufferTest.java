@@ -10,19 +10,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.nio.BufferUnderflowException;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class DeserializerBufferTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(DeserializerBufferTest.class);
 
     @Test
-    void deserializePoint_should_match_expected_object() {
+    void deserializePoint_should_match_expected_object() throws ValueDeserializationException {
         byte[] serializedBytes = new byte[]{4, 0, 0, 0, 2, 0, 0, 0, 9, 0, 0, 0};
 
         DeserializerBuffer deserializerBuffer = new DeserializerBuffer(serializedBytes);
@@ -36,7 +33,7 @@ class DeserializerBufferTest {
     }
 
     @Test
-    void deserializeCircle_should_match_expected_object() {
+    void deserializeCircle_should_match_expected_object() throws ValueDeserializationException {
         byte[] serializedBytes = new byte[]{4, 0, 0, 0, 2, 0, 0, 0, 9, 0, 0, 0, 0, 0, -96, 64};
 
         DeserializerBuffer deserializerBuffer = new DeserializerBuffer(serializedBytes);
@@ -50,7 +47,7 @@ class DeserializerBufferTest {
     }
 
     @Test
-    void deserializePolygon_should_match_expected_object() {
+    void deserializePolygon_should_match_expected_object() throws ValueDeserializationException {
         byte[] serializedBytes = new byte[]{4, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, -1, -1, -1, -1, 0, 0, 0, 0, -1, -1, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0};
 
         DeserializerBuffer deserializerBuffer = new DeserializerBuffer(serializedBytes);
@@ -235,21 +232,21 @@ class DeserializerBufferTest {
     void dataWithWrongInputLength_should_throw_BufferUnderflowException() {
         DeserializerBuffer deserializerBuffer1 = new DeserializerBuffer("");
 
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readBool);
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readU32);
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readU64);
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readU128);
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readU256);
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readU512);
-        assertThrows(BufferUnderflowException.class, deserializerBuffer1::readString);
-        assertThrows(BufferUnderflowException.class, () -> deserializerBuffer1.readByteArray(32));
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readBool);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readU32);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readU64);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readU128);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readU256);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readU512);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer1::readString);
+        assertThrows(ValueDeserializationException.class, () -> deserializerBuffer1.readByteArray(32));
 
         DeserializerBuffer deserializerBuffer2 = new DeserializerBuffer("01");
 
-        assertThrows(BufferUnderflowException.class, deserializerBuffer2::readU512);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer2::readU512);
 
         DeserializerBuffer deserializerBuffer3 = new DeserializerBuffer("01");
 
-        assertThrows(BufferUnderflowException.class, deserializerBuffer3::readString);
+        assertThrows(ValueDeserializationException.class, deserializerBuffer3::readString);
     }
 }
