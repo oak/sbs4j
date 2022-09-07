@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
      */
     public static void reverse(byte[] bytes, int from, int to) {
 <span class="fc" id="L49">        LOGGER.debug(&quot;Reversing {}&quot;, bytes);</span>
-<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (int i = from; i &lt; Math.abs((to - from) / 2f) + from; i++) {</span>
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        for (int i = from; i &lt; Math.ceil((to - from) / 2f) + from; i++) {</span>
 <span class="fc" id="L51">            byte temp = bytes[i];</span>
 <span class="fc" id="L52">            bytes[i] = bytes[to - i + from];</span>
 <span class="fc" id="L53">            bytes[to - i + from] = temp;</span>

@@ -76,7 +76,7 @@
 <a class="jxr_linenumber" name="L68" href="#L68">68</a>      }
 <a class="jxr_linenumber" name="L69" href="#L69">69</a>  
 <a class="jxr_linenumber" name="L70" href="#L70">70</a>      @Test
-<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">void</strong> validateDeserialize_with_SampleData() <strong class="jxr_keyword">throws</strong> ValueDeserializationException {
+<a class="jxr_linenumber" name="L71" href="#L71">71</a>      <strong class="jxr_keyword">void</strong> validateDeserialize_LITTLE_ENDIAN_with_SampleData() <strong class="jxr_keyword">throws</strong> ValueDeserializationException {
 <a class="jxr_linenumber" name="L72" href="#L72">72</a>          <strong class="jxr_keyword">for</strong> (TestData&lt;?&gt; testData : TestData.SUCCESS_TEST_DATA) {
 <a class="jxr_linenumber" name="L73" href="#L73">73</a>              DeserializerBuffer deserializerBuffer = <strong class="jxr_keyword">new</strong> DeserializerBuffer(testData.getByteValueLittleEndian());
 <a class="jxr_linenumber" name="L74" href="#L74">74</a>              <strong class="jxr_keyword">switch</strong> (testData.getName()) {
