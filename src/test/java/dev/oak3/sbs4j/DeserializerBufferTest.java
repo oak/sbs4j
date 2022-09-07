@@ -68,7 +68,7 @@ class DeserializerBufferTest {
     }
 
     @Test
-    void validateDeserialize_with_SampleData() throws ValueDeserializationException {
+    void validateDeserialize_LITTLE_ENDIAN_with_SampleData() throws ValueDeserializationException {
         for (TestData<?> testData : TestData.SUCCESS_TEST_DATA) {
             DeserializerBuffer deserializerBuffer = new DeserializerBuffer(testData.getByteValueLittleEndian());
             switch (testData.getName()) {

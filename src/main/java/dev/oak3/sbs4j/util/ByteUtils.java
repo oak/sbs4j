@@ -47,7 +47,7 @@ public final class ByteUtils {
      */
     public static void reverse(byte[] bytes, int from, int to) {
         LOGGER.debug("Reversing {}", bytes);
-        for (int i = from; i < Math.abs((to - from) / 2f) + from; i++) {
+        for (int i = from; i < Math.ceil((to - from) / 2f) + from; i++) {
             byte temp = bytes[i];
             bytes[i] = bytes[to - i + from];
             bytes[to - i + from] = temp;

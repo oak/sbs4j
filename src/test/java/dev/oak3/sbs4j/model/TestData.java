@@ -118,6 +118,7 @@ public class TestData<T> {
             new TestData<>(U_256, new BigInteger("1024", 10), new byte[]{2, 0, 4}, new byte[]{2, 4, 0}),
             new TestData<>(U_512, new BigInteger("123456789101112131415", 10), new byte[]{9, 87, -1, 26, -38, -107, -97, 78, -79, 6}, new byte[]{9, 6, -79, 78, -97, -107, -38, 26, -1, 87}),
             new TestData<>(U_512, new BigInteger("2500010000", 10), new byte[]{4, 16, 32, 3, -107}, new byte[]{4, -107, 3, 32, 16}),
+            new TestData<>(U_512, new BigInteger("0", 10), new byte[]{0}, new byte[]{0}),
             new TestData<>(STRING, "the string", new byte[]{10, 0, 0, 0, 116, 104, 101, 32, 115, 116, 114, 105, 110, 103}, new byte[]{0, 0, 0, 10, 116, 104, 101, 32, 115, 116, 114, 105, 110, 103}),
             new TestData<>(STRING, "Hello, World!", new byte[]{13, 0, 0, 0, 72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33}, new byte[]{0, 0, 0, 13, 72, 101, 108, 108, 111, 44, 32, 87, 111, 114, 108, 100, 33}));
 
