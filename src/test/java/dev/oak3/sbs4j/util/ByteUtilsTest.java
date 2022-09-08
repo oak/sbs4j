@@ -64,4 +64,24 @@ class ByteUtilsTest {
 
         assertArrayEquals(expected, input);
     }
+
+    @Test
+    void reverseEmptyByteArray() {
+        byte[] expected = new byte[]{};
+        byte[] input = new byte[]{};
+
+        ByteUtils.reverse(input);
+
+        assertArrayEquals(expected, input);
+    }
+
+    @Test
+    void reverseOneElementByteArray() {
+        byte[] expected = new byte[]{0};
+        byte[] input = new byte[]{0};
+
+        ByteUtils.reverse(input);
+
+        assertArrayEquals(expected, input);
+    }
 }
