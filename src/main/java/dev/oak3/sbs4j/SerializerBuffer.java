@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 import static java.util.Objects.requireNonNull;
@@ -254,8 +255,8 @@ public class SerializerBuffer {
     public void writeString(String value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, String.class.getSimpleName(), value);
 
-        this.buffer.putInt(value.length());
-        this.buffer.put(value.getBytes());
+        this.buffer.putInt(value.getBytes(StandardCharsets.UTF_8).length);
+        this.buffer.put(value.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

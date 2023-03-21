@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /**
@@ -324,7 +325,7 @@ public class DeserializerBuffer {
 
             LOGGER.debug(LOG_BUFFER_VALUE_MESSAGE_STRING, bufString);
 
-            String string = new String(bufString);
+            String string = new String(bufString, StandardCharsets.UTF_8);
 
             LOGGER.debug(LOG_SERIALIZED_VALUE_MESSAGE_STRING, String.class.getSimpleName(), string);
 
