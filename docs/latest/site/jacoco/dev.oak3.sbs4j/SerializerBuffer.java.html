@@ -23,7 +23,7 @@ public class SerializerBuffer {
 
 <span class="fc" id="L24">    private static final Logger LOGGER = LoggerFactory.getLogger(SerializerBuffer.class);</span>
 
-    private final ByteBuffer buffer;
+    private ByteBuffer buffer;
 
     private static final int INITIAL_CAPACITY = 4096;
 
@@ -77,7 +77,7 @@ public class SerializerBuffer {
 
 <span class="pc bpc" id="L78" title="1 of 2 branches missed.">        byte boolByte = Boolean.TRUE.equals(value) ? (byte) 0x01 : (byte) 0x00;</span>
 
-<span class="fc" id="L80">        this.buffer.put(boolByte);</span>
+<span class="fc" id="L80">        put(boolByte);</span>
 <span class="fc" id="L81">    }</span>
 
     /**
@@ -88,7 +88,7 @@ public class SerializerBuffer {
     public void writeU8(byte value) {
 <span class="fc" id="L89">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L91">        this.buffer.put(value);</span>
+<span class="fc" id="L91">        put(value);</span>
 <span class="fc" id="L92">    }</span>
 
     /**
@@ -99,7 +99,7 @@ public class SerializerBuffer {
     public void writeByteArray(byte[] value) {
 <span class="fc" id="L100">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, byte[].class.getSimpleName(), value);</span>
 
-<span class="fc" id="L102">        this.buffer.put(value);</span>
+<span class="fc" id="L102">        put(value);</span>
 <span class="fc" id="L103">    }</span>
 
     /**
@@ -110,7 +110,7 @@ public class SerializerBuffer {
     public void writeF32(float value) {
 <span class="fc" id="L111">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L113">        this.buffer.putFloat(value);</span>
+<span class="fc" id="L113">        put(value);</span>
 <span class="fc" id="L114">    }</span>
 
     /**
@@ -121,7 +121,7 @@ public class SerializerBuffer {
     public void writeF64(double value) {
 <span class="fc" id="L122">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L124">        this.buffer.putDouble(value);</span>
+<span class="fc" id="L124">        put(value);</span>
 <span class="fc" id="L125">    }</span>
 
     /**
@@ -132,7 +132,7 @@ public class SerializerBuffer {
     public void writeI32(int value) {
 <span class="fc" id="L133">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L135">        this.buffer.putInt(value);</span>
+<span class="fc" id="L135">        put(value);</span>
 <span class="fc" id="L136">    }</span>
 
     /**
@@ -143,7 +143,7 @@ public class SerializerBuffer {
     public void writeU32(Long value) {
 <span class="fc" id="L144">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L146">        this.buffer.putInt(value.intValue());</span>
+<span class="fc" id="L146">        put(value.intValue());</span>
 <span class="fc" id="L147">    }</span>
 
     /**
@@ -154,7 +154,7 @@ public class SerializerBuffer {
     public void writeI64(long value) {
 <span class="fc" id="L155">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L157">        this.buffer.putLong(value);</span>
+<span class="fc" id="L157">        put(value);</span>
 <span class="fc" id="L158">    }</span>
 
     /**
@@ -171,7 +171,7 @@ public class SerializerBuffer {
 <span class="fc" id="L171">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(),</span>
                 value);
 
-<span class="fc" id="L174">        this.buffer.putLong(value.longValue());</span>
+<span class="fc" id="L174">        put(value.longValue());</span>
 <span class="fc" id="L175">    }</span>
 
     /**
@@ -242,8 +242,8 @@ public class SerializerBuffer {
 <span class="fc" id="L242">            ByteUtils.reverse(bigIntegerBytes);</span>
         }
 
-<span class="fc" id="L245">        this.buffer.put(bigIntegerLength);</span>
-<span class="fc" id="L246">        this.buffer.put(bigIntegerBytes);</span>
+<span class="fc" id="L245">        put(bigIntegerLength);</span>
+<span class="fc" id="L246">        put(bigIntegerBytes);</span>
 <span class="fc" id="L247">    }</span>
 
     /**
@@ -255,8 +255,8 @@ public class SerializerBuffer {
     public void writeString(String value) {
 <span class="fc" id="L256">        LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, String.class.getSimpleName(), value);</span>
 
-<span class="fc" id="L258">        this.buffer.putInt(value.getBytes(StandardCharsets.UTF_8).length);</span>
-<span class="fc" id="L259">        this.buffer.put(value.getBytes(StandardCharsets.UTF_8));</span>
+<span class="fc" id="L258">        put(value.getBytes(StandardCharsets.UTF_8).length);</span>
+<span class="fc" id="L259">        put(value.getBytes(StandardCharsets.UTF_8));</span>
 <span class="fc" id="L260">    }</span>
 
     /**
@@ -305,5 +305,75 @@ public class SerializerBuffer {
 <span class="fc" id="L305">        return Arrays.copyOfRange(this.buffer.array(),</span>
 <span class="fc" id="L306">                this.buffer.arrayOffset(), this.buffer.arrayOffset() + this.buffer.position());</span>
     }
+
+    private void put(byte newByte) {
+        // check if it fits and increase buffer if needed
+<span class="pc bpc" id="L311" title="1 of 2 branches missed.">        if (this.buffer.position() + 1 &gt;= this.buffer.capacity()) {</span>
+<span class="nc" id="L312">            increaseCapacity(1);</span>
+        }
+<span class="fc" id="L314">        this.buffer.put(newByte);</span>
+<span class="fc" id="L315">    }</span>
+
+    private void put(byte[] newBytes) {
+        // check if it fits and increase buffer if needed
+<span class="fc bfc" id="L319" title="All 2 branches covered.">        if (this.buffer.position() + newBytes.length &gt;= this.buffer.capacity()) {</span>
+<span class="fc" id="L320">            increaseCapacity(newBytes.length);</span>
+        }
+<span class="fc" id="L322">        this.buffer.put(newBytes);</span>
+<span class="fc" id="L323">    }</span>
+
+    private void put(float bytes) {
+        // check if it fits and increase buffer if needed
+<span class="pc bpc" id="L327" title="1 of 2 branches missed.">        if (this.buffer.position() + 4 &gt;= this.buffer.capacity()) {</span>
+<span class="nc" id="L328">            increaseCapacity(4);</span>
+        }
+<span class="fc" id="L330">        this.buffer.putFloat(bytes);</span>
+<span class="fc" id="L331">    }</span>
+
+    private void put(double bytes) {
+        // check if it fits and increase buffer if needed
+<span class="pc bpc" id="L335" title="1 of 2 branches missed.">        if (this.buffer.position() + 8 &gt;= this.buffer.capacity()) {</span>
+<span class="nc" id="L336">            increaseCapacity(8);</span>
+        }
+<span class="fc" id="L338">        this.buffer.putDouble(bytes);</span>
+<span class="fc" id="L339">    }</span>
+
+    private void put(int bytes) {
+        // check if it fits and increase buffer if needed
+<span class="pc bpc" id="L343" title="1 of 2 branches missed.">        if (this.buffer.position() + 4 &gt;= this.buffer.capacity()) {</span>
+<span class="nc" id="L344">            increaseCapacity(4);</span>
+        }
+<span class="fc" id="L346">        this.buffer.putInt(bytes);</span>
+<span class="fc" id="L347">    }</span>
+
+    private void put(long bytes) {
+        // check if it fits and increase buffer if needed
+<span class="pc bpc" id="L351" title="1 of 2 branches missed.">        if (this.buffer.position() + 8 &gt;= this.buffer.capacity()) {</span>
+<span class="nc" id="L352">            increaseCapacity(8);</span>
+        }
+<span class="fc" id="L354">        this.buffer.putLong(bytes);</span>
+<span class="fc" id="L355">    }</span>
+
+    /**
+     * Increases the buffer size and replaces with the new capacity buffer including current buffer data
+     *
+     * @param increaseByteCount the byte count to increase
+     * @throws IllegalArgumentException if the parameter is invalid
+     */
+    protected void increaseCapacity(int increaseByteCount) throws IllegalArgumentException {
+<span class="pc bpc" id="L364" title="1 of 2 branches missed.">        if (this.buffer == null) {</span>
+<span class="nc" id="L365">            throw new IllegalArgumentException(&quot;Buffer is null&quot;);</span>
+        }
+
+<span class="pc bpc" id="L368" title="1 of 2 branches missed.">        if (increaseByteCount &lt; 0) {</span>
+<span class="nc" id="L369">            throw new IllegalArgumentException(&quot;Size cannot be less than 0&quot;);</span>
+        }
+
+<span class="fc" id="L372">        int newCapacity = this.buffer.capacity() + increaseByteCount;</span>
+<span class="fc" id="L373">        ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);</span>
+<span class="fc" id="L374">        this.buffer.flip();</span>
+<span class="fc" id="L375">        newBuffer.put(this.buffer);</span>
+<span class="fc" id="L376">        this.buffer = newBuffer;</span>
+<span class="fc" id="L377">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
