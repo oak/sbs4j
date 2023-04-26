@@ -9,13 +9,17 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.nio.ByteOrder;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SerializerBufferTest {
     private static final Logger LOGGER = LoggerFactory.getLogger(SerializerBufferTest.class);
@@ -69,6 +73,20 @@ class SerializerBufferTest {
         byte[] serializedBytes = serializerBuffer.toByteArray();
 
         assertArrayEquals(expectedBytes, serializedBytes);
+    }
+
+    @Test
+    void validateSerialize_with_large_data_without_buffer_overflow() throws URISyntaxException, IOException {
+        Path imagePath = Paths.get(Objects.requireNonNull(getClass().getClassLoader().getResource("test_image.png")).toURI());
+        final byte[] inputBytes = Files.readAllBytes(imagePath);
+
+        SerializerBuffer serializerBuffer = new SerializerBuffer();
+        assertDoesNotThrow(() -> serializerBuffer.writeI32(1));
+        assertDoesNotThrow(() -> serializerBuffer.writeF32(2.0f));
+        assertDoesNotThrow(() -> serializerBuffer.writeI64(3));
+        assertDoesNotThrow(() -> serializerBuffer.writeF64(2.0));
+        assertDoesNotThrow(() -> serializerBuffer.writeByteArray(inputBytes));
+        assertDoesNotThrow(() -> serializerBuffer.writeString("Test string"));
     }
 
     @Test

@@ -23,7 +23,7 @@ public class SerializerBuffer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SerializerBuffer.class);
 
-    private final ByteBuffer buffer;
+    private ByteBuffer buffer;
 
     private static final int INITIAL_CAPACITY = 4096;
 
@@ -77,7 +77,7 @@ public class SerializerBuffer {
 
         byte boolByte = Boolean.TRUE.equals(value) ? (byte) 0x01 : (byte) 0x00;
 
-        this.buffer.put(boolByte);
+        put(boolByte);
     }
 
     /**
@@ -88,7 +88,7 @@ public class SerializerBuffer {
     public void writeU8(byte value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Byte.class.getSimpleName(), value);
 
-        this.buffer.put(value);
+        put(value);
     }
 
     /**
@@ -99,7 +99,7 @@ public class SerializerBuffer {
     public void writeByteArray(byte[] value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, byte[].class.getSimpleName(), value);
 
-        this.buffer.put(value);
+        put(value);
     }
 
     /**
@@ -110,7 +110,7 @@ public class SerializerBuffer {
     public void writeF32(float value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Float.class.getSimpleName(), value);
 
-        this.buffer.putFloat(value);
+        put(value);
     }
 
     /**
@@ -121,7 +121,7 @@ public class SerializerBuffer {
     public void writeF64(double value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Double.class.getSimpleName(), value);
 
-        this.buffer.putDouble(value);
+        put(value);
     }
 
     /**
@@ -132,7 +132,7 @@ public class SerializerBuffer {
     public void writeI32(int value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);
 
-        this.buffer.putInt(value);
+        put(value);
     }
 
     /**
@@ -143,7 +143,7 @@ public class SerializerBuffer {
     public void writeU32(Long value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Integer.class.getSimpleName(), value);
 
-        this.buffer.putInt(value.intValue());
+        put(value.intValue());
     }
 
     /**
@@ -154,7 +154,7 @@ public class SerializerBuffer {
     public void writeI64(long value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, Long.class.getSimpleName(), value);
 
-        this.buffer.putLong(value);
+        put(value);
     }
 
     /**
@@ -171,7 +171,7 @@ public class SerializerBuffer {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, BigInteger.class.getSimpleName(),
                 value);
 
-        this.buffer.putLong(value.longValue());
+        put(value.longValue());
     }
 
     /**
@@ -242,8 +242,8 @@ public class SerializerBuffer {
             ByteUtils.reverse(bigIntegerBytes);
         }
 
-        this.buffer.put(bigIntegerLength);
-        this.buffer.put(bigIntegerBytes);
+        put(bigIntegerLength);
+        put(bigIntegerBytes);
     }
 
     /**
@@ -255,8 +255,8 @@ public class SerializerBuffer {
     public void writeString(String value) {
         LOGGER.debug(LOG_BUFFER_WRITE_TYPE_VALUE_MESSAGE_STRING, String.class.getSimpleName(), value);
 
-        this.buffer.putInt(value.getBytes(StandardCharsets.UTF_8).length);
-        this.buffer.put(value.getBytes(StandardCharsets.UTF_8));
+        put(value.getBytes(StandardCharsets.UTF_8).length);
+        put(value.getBytes(StandardCharsets.UTF_8));
     }
 
     /**
@@ -304,5 +304,75 @@ public class SerializerBuffer {
     public byte[] toByteArray() {
         return Arrays.copyOfRange(this.buffer.array(),
                 this.buffer.arrayOffset(), this.buffer.arrayOffset() + this.buffer.position());
+    }
+
+    private void put(byte newByte) {
+        // check if it fits and increase buffer if needed
+        if (this.buffer.position() + 1 >= this.buffer.capacity()) {
+            increaseCapacity(1);
+        }
+        this.buffer.put(newByte);
+    }
+
+    private void put(byte[] newBytes) {
+        // check if it fits and increase buffer if needed
+        if (this.buffer.position() + newBytes.length >= this.buffer.capacity()) {
+            increaseCapacity(newBytes.length);
+        }
+        this.buffer.put(newBytes);
+    }
+
+    private void put(float bytes) {
+        // check if it fits and increase buffer if needed
+        if (this.buffer.position() + 4 >= this.buffer.capacity()) {
+            increaseCapacity(4);
+        }
+        this.buffer.putFloat(bytes);
+    }
+
+    private void put(double bytes) {
+        // check if it fits and increase buffer if needed
+        if (this.buffer.position() + 8 >= this.buffer.capacity()) {
+            increaseCapacity(8);
+        }
+        this.buffer.putDouble(bytes);
+    }
+
+    private void put(int bytes) {
+        // check if it fits and increase buffer if needed
+        if (this.buffer.position() + 4 >= this.buffer.capacity()) {
+            increaseCapacity(4);
+        }
+        this.buffer.putInt(bytes);
+    }
+
+    private void put(long bytes) {
+        // check if it fits and increase buffer if needed
+        if (this.buffer.position() + 8 >= this.buffer.capacity()) {
+            increaseCapacity(8);
+        }
+        this.buffer.putLong(bytes);
+    }
+
+    /**
+     * Increases the buffer size and replaces with the new capacity buffer including current buffer data
+     *
+     * @param increaseByteCount the byte count to increase
+     * @throws IllegalArgumentException if the parameter is invalid
+     */
+    protected void increaseCapacity(int increaseByteCount) throws IllegalArgumentException {
+        if (this.buffer == null) {
+            throw new IllegalArgumentException("Buffer is null");
+        }
+
+        if (increaseByteCount < 0) {
+            throw new IllegalArgumentException("Size cannot be less than 0");
+        }
+
+        int newCapacity = this.buffer.capacity() + increaseByteCount;
+        ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
+        this.buffer.flip();
+        newBuffer.put(this.buffer);
+        this.buffer = newBuffer;
     }
 }
