@@ -372,6 +372,7 @@ public class SerializerBuffer {
         int newCapacity = this.buffer.capacity() + increaseByteCount;
         ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);
         this.buffer.flip();
+        newBuffer.order(this.buffer.order());
         newBuffer.put(this.buffer);
         this.buffer = newBuffer;
     }
