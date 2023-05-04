@@ -372,8 +372,9 @@ public class SerializerBuffer {
 <span class="fc" id="L372">        int newCapacity = this.buffer.capacity() + increaseByteCount;</span>
 <span class="fc" id="L373">        ByteBuffer newBuffer = ByteBuffer.allocate(newCapacity);</span>
 <span class="fc" id="L374">        this.buffer.flip();</span>
-<span class="fc" id="L375">        newBuffer.put(this.buffer);</span>
-<span class="fc" id="L376">        this.buffer = newBuffer;</span>
-<span class="fc" id="L377">    }</span>
+<span class="fc" id="L375">        newBuffer.order(this.buffer.order());</span>
+<span class="fc" id="L376">        newBuffer.put(this.buffer);</span>
+<span class="fc" id="L377">        this.buffer = newBuffer;</span>
+<span class="fc" id="L378">    }</span>
 }
 </pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
