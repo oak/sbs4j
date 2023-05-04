@@ -5,5 +5,5 @@ menu_title: 0.1.4
 category: surefire_reports
 layout: iframe
 iframe_url: /docs/0.1.4/site/surefire-report.html
-order: 7
+order: 8
 ---
